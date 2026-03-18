@@ -4,34 +4,17 @@
 
 This project analyzes whether political discourse in French electoral manifestos is primarily structured by **party ideology** or by **candidates' socio-professional characteristics**.
 
-Using manifesto texts from the **Archelec archive (Sciences Po / CEVIPOF)**, we apply **topic modeling and regression analysis** to measure how much variation in political themes is explained by:
-
-* Party affiliation
-* Candidate profession
-* Election year
-
-The goal is to quantify whether manifesto discourse is driven more by **party discipline** or by **candidate-level social backgrounds**.
+Using manifesto texts from the Archelec archive (Sciences Po / CEVIPOF), we apply **topic modeling (LDA)** and **regression analysis** to measure how much variation in political themes is explained by party, profession, and year.
 
 ---
 
-## Methodology
+## Phase 0 — Initialization
 
-The analysis follows these steps:
+This repository is initialized from a previous NLP project.
 
-1. **Data collection and cleaning** of manifesto texts and metadata.
-2. **Exploratory data analysis** of the corpus.
-3. **Topic modeling** using Latent Dirichlet Allocation (LDA).
-4. **Regression analysis** estimating topic prevalence as a function of party, profession, and year.
-5. **Robustness checks**, including varying the number of topics and permutation tests.
-
----
-
-## Data Sources
-
-* Metadata: <https://archelec.sciencespo.fr>
-* OCR transcriptions: <https://gitlab.teklia.com/ckermorvant/arkindex_archelec>
-
-The dataset contains French electoral manifestos from several legislative elections.
+* `main` preserves the initial checkpoint
+* `mlops` is the working branch
+* notebooks are kept for **exploration only**
 
 ---
 
@@ -39,15 +22,8 @@ The dataset contains French electoral manifestos from several legislative electi
 
 ```
 PROJECT
-│
-├── data/                # Raw texts and processed datasets
-├── notebooks/           # Analysis notebooks
-│   ├── 01_cleaning.ipynb
-│   ├── 02_eda.ipynb
-│   ├── 03_topic_model.ipynb
-│   ├── 04_regression.ipynb
-│   └── 05_robustness.ipynb
-│
+├── data/                # Raw and processed data
+├── notebooks/           # Exploration only
 ├── requirements.txt
 └── README.md
 ```
@@ -62,8 +38,42 @@ pip install -r requirements.txt
 
 ---
 
-## Author
+## Phase 1 — MLOps Product Scope
 
-NY Sarakpy  
-ENSAE Paris – NLP Course Project  
-GitHub: <https://github.com/sarakpyny>
+### Problem
+
+Determine whether manifesto topics are better explained by **party** or **profession**.
+
+### Input
+
+* Manifesto texts
+* Metadata: party, profession, year
+
+### Processing
+
+* Preprocessing (cleaning, tokenization)
+* Topic modeling (LDA)
+* Regression / variance analysis
+
+### Output
+
+* Topic distributions
+* Party/profession profiles
+* Statistical results
+
+### Users
+
+* Instructors
+* Researchers
+* Data scientists
+
+### Usage
+
+* Batch execution (current)
+* API / dashboard (future)
+
+### System
+
+**data → preprocessing → modeling → analysis → usage**
+
+---
