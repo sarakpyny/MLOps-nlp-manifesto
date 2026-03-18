@@ -219,3 +219,22 @@ __marimo__/
 nltk_data/
 legislatives/
 presidentielle/
+
+# MLOps
+__pycache__/
+.ipynb_checkpoints/
+.env
+.venv/
+venv/
+data/
+outputs/
+models/
+logs/
+mlruns/
+*.pyc
+*.pyo
+*.parquet
+*.joblib
+*.pkl
+*.skops
+.DS_Store

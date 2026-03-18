@@ -21,9 +21,11 @@ This repository is initialized from a previous NLP project.
 ## Project Structure
 
 ```
-PROJECT
-├── data/                # Raw and processed data
-├── notebooks/           # Exploration only
+PROJECT/
+├── data/                  # Raw input data
+├── notebooks/             # Exploration only
+├── outputs/               # Saved artifacts from train.py
+├── train.py               # Phase 2 terminal baseline
 ├── requirements.txt
 └── README.md
 ```
@@ -34,6 +36,8 @@ PROJECT
 
 ```bash
 pip install -r requirements.txt
+python -m spacy download fr_core_news_md
+python -c "import nltk; nltk.download('stopwords')"
 ```
 
 ---
@@ -42,38 +46,67 @@ pip install -r requirements.txt
 
 ### Problem
 
-Determine whether manifesto topics are better explained by **party** or **profession**.
+Determine whether manifesto topics are better explained by **party affiliation** or **profession**.
 
 ### Input
 
 * Manifesto texts
-* Metadata: party, profession, year
+* Metadata such as:
+  * political party
+  * profession
+  * election year
+  * additional candidate attributes when available
 
 ### Processing
 
-* Preprocessing (cleaning, tokenization)
-* Topic modeling (LDA)
-* Regression / variance analysis
+* Load manifesto corpus
+* Merge metadata
+* Clean and filter texts
+* Lemmatize text
+* Train a topic model
+* Produce document-topic outputs
 
 ### Output
 
-* Topic distributions
-* Party/profession profiles
-* Statistical results
+* Topic distributions by document
+* Topic keyword summaries
+* Cleaned corpus with metadata
+* Saved model artifacts
 
 ### Users
 
 * Instructors
 * Researchers
-* Data scientists
+* Political science users
+* Data science students
 
 ### Usage
 
-* Batch execution (current)
-* API / dashboard (future)
+* Batch execution from terminal
+* API / dashboard in later phases
 
 ### System
 
-**data → preprocessing → modeling → analysis → usage**
+**data → preprocessing → topic modeling → outputs → usage**
 
 ---
+
+## Phase 2 — Terminal Baseline Pipeline
+
+The first executable baseline replaces notebook-only execution with a single script that runs end to end from the terminal.
+
+### Goal
+
+Build one minimal pipeline that:
+
+* loads manifesto texts
+* merges metadata
+* cleans and filters texts
+* trains one topic model
+* generates outputs
+* saves artifacts locally
+
+### Entry Point
+
+```bash
+python train.py --n-topics 8
