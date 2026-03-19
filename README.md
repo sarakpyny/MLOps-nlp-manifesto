@@ -35,7 +35,8 @@ PROJECT/
 │   ├── analysis/           # Analytical modules (future)
 │   ├── inference/          # Inference pipeline (future)
 │   └── utils/              # CLI config and shared utilities
-├── tests/                  # Unit tests (future)
+├── tests/                  # Unit tests (Phase 6)
+├── logs/                   # Log files (ignored by Git)
 ├── train.py                # Main pipeline entry point
 ├── pyproject.toml          # Project dependencies (Phase 5)
 ├── uv.lock                 # Locked environment (Phase 5)
@@ -53,7 +54,7 @@ PROJECT/
 Clone the repository and rebuild the environment:
 
 ```bash
-git clone <https://github.com/sarakpyny/MLOps-nlp-manifesto.git>
+git clone https://github.com/sarakpyny/MLOps-nlp-manifesto.git
 bash install.sh
 source .venv/bin/activate
 cp .env.example .env
@@ -92,7 +93,7 @@ The following are intentionally **not versioned**:
 * raw data (`data/`)
 * outputs (`outputs/`)
 * model artifacts (`*.joblib`)
-* logs
+* logs (`logs/`)
 * secrets (`.env`)
 
 ---
@@ -154,6 +155,15 @@ outputs/<experiment_name>/
 └── run_config.json
 ```
 
+## Testing
+
+Run the full test suite:
+
+```bash
+uv run pytest -v
+
+```
+
 ---
 
 ## MLOps Phases
@@ -186,7 +196,7 @@ outputs/<experiment_name>/
 * Separated data, preprocessing, features, modeling, and outputs
 * `train.py` handles orchestration only
 
-### Phase 5 — Reproducibility First (current)
+### Phase 5 — Reproducibility
 
 * Added `pyproject.toml` for explicit dependency management
 * Added `uv.lock` for locked reproducible environments
@@ -197,18 +207,21 @@ outputs/<experiment_name>/
 
 ---
 
+## Phase 6 — Logging & Tests (current)
+
+* Added structured logging to console and file
+* Replaced print-based pipeline traces with logging
+* Added 11 unit tests covering core pipeline components
+* Improved reliability and traceability before CI
+
 ## Next Steps
 
-Planned improvements in future phases:
-
-* Add unit tests (`tests/`)
+* Planned improvements in future phases:
+* Add CI/CD workflows (`.github/workflows/`)
 * Introduce experiment tracking (MLflow)
 * Build inference pipeline (`src/inference/`)
 * Create API with FastAPI (`app/`)
-* Add CI/CD workflows (`.github/workflows/`)
 * Containerize with Docker (`deployment/`)
-
----
 
 ## Users
 
