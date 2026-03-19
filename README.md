@@ -38,6 +38,7 @@ PROJECT/
 pip install -r requirements.txt
 python -m spacy download fr_core_news_md
 python -c "import nltk; nltk.download('stopwords')"
+cp .env.example .env
 ```
 
 ---
@@ -106,7 +107,43 @@ Build one minimal pipeline that:
 * generates outputs
 * saves artifacts locally
 
-### Entry Point
+### Run the baseline topic-model training
+
+Run it fast, without lemmatization:
 
 ```bash
-python train.py --n-topics 8
+python train.py \
+  --n-topics 8 \
+  --min-doc-length 100 \
+  --start-year 1981 \
+  --end-year 1993 \
+  --random-seed 42 \
+  --output-dir outputs \
+  --experiment-name baseline_lda
+  ```
+
+Run it with lemmatization:
+
+```bash
+python train.py \
+  --n-topics 8 \
+  --min-doc-length 100 \
+  --start-year 1981 \
+  --end-year 1993 \
+  --random-seed 42 \
+  --output-dir outputs \
+  --experiment-name baseline_lda_lemma \
+  --use-lemmatization
+  ```
+
+## Phase 3 — Clean and parameterized script
+
+This phase removes notebook-style hidden parameters and makes the pipeline configurable from the terminal.
+
+Main improvements:
+
+* CLI parameters with `argparse`
+* `.env.example` for environment configuration
+* helper functions for repeated logic
+* cleaner output organization by experiment name
+* linting with Ruff and PyLint
