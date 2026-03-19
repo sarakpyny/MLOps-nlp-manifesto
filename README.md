@@ -6,6 +6,10 @@ This project analyzes whether political discourse in French electoral manifestos
 
 Using manifesto texts from the Archelec archive (Sciences Po / CEVIPOF), we apply **topic modeling (LDA)** to extract themes and quantify how they vary across parties, professions, and time.
 
+This project is adapted from the original NLP work:  
+
+<https://github.com/sarakpyny/NLP-Course-Ensae/tree/main/Project>
+
 ---
 
 ## MLOps Objective
@@ -14,7 +18,7 @@ The goal of this project is to transform a research-style NLP notebook into a **
 
 The system follows a full pipeline:
 
-```
+```bash
 data → preprocessing → feature preparation → modeling → outputs → usage
 ```
 
@@ -164,15 +168,32 @@ print(result)
 
 ## API
 
-Run the API
+### Run the API
 
 ```bash
 uv run uvicorn app.api:app --reload
 
 ```
 
+### Access interactive
+
+#### Local
+
 ```bash
+
+http://127.0.0.1:8000/docs
+```
+
+#### Remote
+
+```bash
+https://<your-instance>/proxy/8000/docs
+```
+
 Example:
+
+```bash
+
 curl -X POST "<http://127.0.0.1:8000/predict_topics>" \
   -H "Content-Type: application/json" \
   -d '{"text": "Nous voulons défendre la justice sociale."}'
