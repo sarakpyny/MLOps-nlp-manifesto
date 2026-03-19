@@ -14,6 +14,10 @@ export PATH="$HOME/.local/bin:$PATH"
 echo "Syncing project environment..."
 uv sync
 
+echo "Bootstrapping pip inside .venv..."
+uv run python -m ensurepip --upgrade
+uv run python -m pip install --upgrade pip
+
 echo "Installing spaCy French model..."
 uv run python -m spacy download fr_core_news_md
 
