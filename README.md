@@ -23,6 +23,12 @@ data → preprocessing → feature preparation → modeling → outputs → usag
 ## Project Structure
 
 ```text
+
+---
+
+## Project Structure
+
+```text
 PROJECT/
 ├── app/                    # Future API or application layer
 ├── deployment/             # Deployment-related files
@@ -33,11 +39,11 @@ PROJECT/
 │   ├── features/           # Dataset preparation and filtering
 │   ├── models/             # Topic modeling logic
 │   ├── analysis/           # Analytical modules (future)
-│   ├── inference/          # Inference pipeline (future)
+│   ├── inference/          # Load trained artifacts and predict on new text
 │   └── utils/              # CLI config and shared utilities
-├── tests/                  # Unit tests (Phase 6)
+├── tests/                  # Unit tests (including inference tests)
 ├── logs/                   # Log files (ignored by Git)
-├── train.py                # Main pipeline entry point
+├── train.py                # Training pipeline entry point
 ├── pyproject.toml          # Project dependencies (Phase 5)
 ├── uv.lock                 # Locked environment (Phase 5)
 ├── install.sh              # One-command setup (Phase 5)
@@ -142,6 +148,29 @@ uv run python train.py \
 
 ---
 
+## Inference
+
+The project now separates training and inference:
+
+* `train.py` builds and saves model artifacts
+* `src/inference/` loads saved artifacts and predicts on new text
+
+Example usage:
+
+```bash
+from pathlib import Path
+from src.inference.predictor import predict_topics
+
+result = predict_topics(
+    text="Nous défendons la justice sociale et les services publics.",
+    experiment_dir=Path("outputs/baseline_lda"),
+)
+
+print(result)
+```
+
+---
+
 ## Outputs
 
 Each run creates a structured output folder:
@@ -152,7 +181,8 @@ outputs/<experiment_name>/
 ├── topics_summary.csv
 ├── lda_model.joblib
 ├── vectorizer.joblib
-└── run_config.json
+├── run_config.json
+└── topic_labels.json
 ```
 
 ## Testing
@@ -207,19 +237,28 @@ uv run pytest -v
 
 ---
 
-## Phase 6 — Logging & Tests (current)
+## Phase 6 — Logging & Tests
 
 * Added structured logging to console and file
 * Replaced print-based pipeline traces with logging
 * Added 11 unit tests covering core pipeline components
 * Improved reliability and traceability before CI
 
+## Phase 7 — Separate Training and Inference
+
+* Kept `train.py` dedicated to model training and artifact generation
+* Implemented `src/inference/` to load saved artifacts and predict on new text
+* Added single-text preprocessing for inference
+* Introduced `topic_labels.json` for human-readable topic outputs
+* Added inference tests for:
+  * invalid input
+  * output structure
+  * probability validity
+
 ## Next Steps
 
-* Planned improvements in future phases:
 * Add CI/CD workflows (`.github/workflows/`)
 * Introduce experiment tracking (MLflow)
-* Build inference pipeline (`src/inference/`)
 * Create API with FastAPI (`app/`)
 * Containerize with Docker (`deployment/`)
 
