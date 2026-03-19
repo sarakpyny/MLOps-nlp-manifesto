@@ -24,7 +24,7 @@ mlruns/
 *.skops
 
 # Data
-data/
+/data/
 *.zip
 *.parquet
 
