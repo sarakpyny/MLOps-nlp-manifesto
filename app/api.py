@@ -1,0 +1,317 @@
+"""FastAPI application for manifesto topic inference and analysis."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any
+
+import pandas as pd
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+
+from src.inference.predictor import predict_topics
+
+APP_NAME = "Manifesto Topic API"
+APP_VERSION = "0.1.0"
+DEFAULT_EXPERIMENT_DIR = Path("outputs/baseline_lda")
+
+
+class PredictRequest(BaseModel):
+    """Request body for topic prediction."""
+
+    text: str = Field(..., min_length=1,
+                      description="Raw manifesto text to analyze.")
+
+
+class PredictResponse(BaseModel):
+    """Response body for topic prediction."""
+
+    processed_text: str
+    top_topic_id: int
+    top_topic_label: str
+    top_topic_score: float
+    topic_distribution: list[float]
+
+
+app = FastAPI(
+    title=APP_NAME,
+    version=APP_VERSION,
+    description="API for French electoral manifesto topic inference and analytical summaries.",
+)
+
+
+def get_experiment_dir() -> Path:
+    """Return the default experiment directory."""
+    return DEFAULT_EXPERIMENT_DIR
+
+
+def read_json_file(path: Path) -> dict[str, Any]:
+    """Read a JSON file."""
+    if not path.exists():
+        raise FileNotFoundError(f"Missing file: {path}")
+    with path.open("r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+def read_csv_file(path: Path) -> pd.DataFrame:
+    """Read a CSV file."""
+    if not path.exists():
+        raise FileNotFoundError(f"Missing file: {path}")
+    return pd.read_csv(path)
+
+
+def get_topic_columns(df: pd.DataFrame) -> list[str]:
+    """Return sorted topic columns safely."""
+    topic_cols = []
+
+    for col in df.columns:
+        if col.startswith("Topic_"):
+            try:
+                int(col.split("_")[1])
+                topic_cols.append(col)
+            except (IndexError, ValueError):
+                continue
+
+    return sorted(topic_cols, key=lambda col: int(col.split("_")[1]))
+
+
+def get_topic_label_map(experiment_dir: Path) -> dict[str, str]:
+    """Load topic labels from the saved experiment."""
+    path = experiment_dir / "topic_labels.json"
+    return read_json_file(path)
+
+
+def get_topics_summary_df(experiment_dir: Path) -> pd.DataFrame:
+    """Load the topic summary CSV."""
+    path = experiment_dir / "topics_summary.csv"
+    return read_csv_file(path)
+
+
+def get_data_topics_df(experiment_dir: Path) -> pd.DataFrame:
+    """Load the document-topic analysis CSV."""
+    path = experiment_dir / "data_topics.csv"
+    return read_csv_file(path)
+
+
+@app.get("/")
+def root() -> dict[str, str]:
+    """Welcome endpoint."""
+    return {
+        "message": "Manifesto Topic API is running.",
+        "docs": "/docs",
+    }
+
+
+@app.get("/health")
+def health() -> dict[str, Any]:
+    """Health check endpoint."""
+    experiment_dir = get_experiment_dir()
+
+    required_files = [
+        experiment_dir / "lda_model.joblib",
+        experiment_dir / "vectorizer.joblib",
+        experiment_dir / "run_config.json",
+        experiment_dir / "topic_labels.json",
+        experiment_dir / "topics_summary.csv",
+        experiment_dir / "data_topics.csv",
+    ]
+
+    missing_files = [str(path) for path in required_files if not path.exists()]
+
+    return {
+        "status": "ok" if not missing_files else "degraded",
+        "experiment_dir": str(experiment_dir),
+        "missing_files": missing_files,
+    }
+
+
+@app.post("/predict_topics", response_model=PredictResponse)
+def predict_topics_endpoint(payload: PredictRequest) -> PredictResponse:
+    """Predict topic distribution for one text."""
+    experiment_dir = get_experiment_dir()
+
+    try:
+        result = predict_topics(
+            text=payload.text, experiment_dir=experiment_dir)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    except Exception as exc:  # pragma: no cover
+        raise HTTPException(
+            status_code=500, detail=f"Prediction failed: {exc}") from exc
+
+    return PredictResponse(**result)
+
+
+@app.get("/topics")
+def get_topics() -> dict[str, list[dict[str, Any]]]:
+    """Return saved topic labels and top words."""
+    experiment_dir = get_experiment_dir()
+
+    try:
+        topic_labels = get_topic_label_map(experiment_dir)
+        topics_summary = get_topics_summary_df(experiment_dir)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    topics: list[dict[str, Any]] = []
+
+    for _, row in topics_summary.iterrows():
+        topic_id = int(row["topic_id"])
+        topics.append(
+            {
+                "topic_id": topic_id,
+                "label": topic_labels.get(str(topic_id), f"topic_{topic_id}"),
+                "top_words": row["top_words"],
+            }
+        )
+
+    return {"topics": topics}
+
+
+@app.get("/stats")
+def get_stats() -> dict[str, Any]:
+    """Return dataset-level descriptive statistics."""
+    experiment_dir = get_experiment_dir()
+
+    try:
+        df = get_data_topics_df(experiment_dir)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    try:
+        stats: dict[str, Any] = {
+            "n_documents": int(len(df)),
+            "n_topics": int(len(get_topic_columns(df))),
+            "n_parties": int(df["party_clean"].nunique()) if "party_clean" in df.columns else None,
+            "n_professions": int(df["profession_clean"].nunique()) if "profession_clean" in df.columns else None,
+            "year_min": int(df["year"].min()) if "year" in df.columns else None,
+            "year_max": int(df["year"].max()) if "year" in df.columns else None,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Stats failed: {e}")
+
+    if "dominant_topic" in df.columns:
+        dominant_counts = (
+            df["dominant_topic"]
+            .value_counts()
+            .sort_index()
+            .to_dict()
+        )
+        stats["dominant_topic_counts"] = {}
+        for key, value in dominant_counts.items():
+            if isinstance(key, str) and key.startswith("Topic_"):
+                topic_id = key.split("_")[1]
+            else:
+                topic_id = str(key)
+
+            stats["dominant_topic_counts"][topic_id] = int(value)
+
+    return stats
+
+
+def build_profile(
+    df: pd.DataFrame,
+    group_column: str,
+    group_value: str,
+    topic_labels: dict[str, str],
+) -> dict[str, Any]:
+    """Build a profile for one party or one profession."""
+    filtered_df = df[df[group_column].astype(
+        str).str.lower() == group_value.lower()].copy()
+
+    if filtered_df.empty:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No records found for {group_column}='{group_value}'.",
+        )
+
+    topic_cols = get_topic_columns(filtered_df)
+    try:
+        mean_scores = filtered_df[topic_cols].mean(
+        ).sort_values(ascending=False)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Profile computation failed: {e}")
+
+    top_topics: list[dict[str, Any]] = []
+    for topic_col, score in mean_scores.head(5).items():
+        topic_id = int(topic_col.split("_")[1])
+        top_topics.append(
+            {
+                "topic_id": topic_id,
+                "label": topic_labels.get(str(topic_id), f"topic_{topic_id}"),
+                "mean_score": float(score),
+            }
+        )
+
+    dominant_distribution = (
+        filtered_df["dominant_topic"].value_counts().sort_index().to_dict()
+        if "dominant_topic" in filtered_df.columns
+        else {}
+    )
+
+    dominant_topic_counts = {}
+    for key, value in dominant_distribution.items():
+        if isinstance(key, str) and key.startswith("Topic_"):
+            topic_id = key.split("_")[1]
+        else:
+            topic_id = str(key)
+
+        dominant_topic_counts[topic_id] = int(value)
+
+    return {
+        "group_column": group_column,
+        "group_value": group_value,
+        "n_documents": int(len(filtered_df)),
+        "top_topics": top_topics,
+        "dominant_topic_counts": dominant_topic_counts,
+    }
+
+
+@app.get("/party_profile/{party}")
+def get_party_profile(party: str) -> dict[str, Any]:
+    """Return topic profile for one party."""
+    experiment_dir = get_experiment_dir()
+
+    try:
+        df = get_data_topics_df(experiment_dir)
+        topic_labels = get_topic_label_map(experiment_dir)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    if "party_clean" not in df.columns:
+        raise HTTPException(
+            status_code=500, detail="Column 'party_clean' not found.")
+
+    return build_profile(
+        df=df,
+        group_column="party_clean",
+        group_value=party,
+        topic_labels=topic_labels,
+    )
+
+
+@app.get("/profession_profile/{profession}")
+def get_profession_profile(profession: str) -> dict[str, Any]:
+    """Return topic profile for one profession."""
+    experiment_dir = get_experiment_dir()
+
+    try:
+        df = get_data_topics_df(experiment_dir)
+        topic_labels = get_topic_label_map(experiment_dir)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    if "profession_clean" not in df.columns:
+        raise HTTPException(
+            status_code=500, detail="Column 'profession_clean' not found.")
+
+    return build_profile(
+        df=df,
+        group_column="profession_clean",
+        group_value=profession,
+        topic_labels=topic_labels,
+    )
