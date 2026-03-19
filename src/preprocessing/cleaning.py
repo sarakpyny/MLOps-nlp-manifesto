@@ -124,11 +124,27 @@ def build_processed_texts(
     spacy_model: str,
 ) -> pd.Series:
     """Normalize texts and optionally lemmatize them."""
-    normalized_texts = normalize_text_series(texts)
+    processed = normalize_text_series(texts)
 
     if use_lemmatization:
-        logger.info("Lemmatizing texts")
-        return lemmatize_series(normalized_texts, spacy_model)
+        processed = lemmatize_series(processed, spacy_model)
 
-    logger.info("Skipping lemmatization and using normalized raw text")
-    return normalized_texts
+    return processed
+
+
+def build_processed_text(
+    text: str,
+    use_lemmatization: bool,
+    spacy_model: str,
+) -> str:
+    """Normalize one text and optionally lemmatize it."""
+    if not isinstance(text, str) or not text.strip():
+        raise ValueError("Input text must be a non-empty string.")
+
+    processed = build_processed_texts(
+        texts=pd.Series([text]),
+        use_lemmatization=use_lemmatization,
+        spacy_model=spacy_model,
+    )
+
+    return processed.iloc[0]

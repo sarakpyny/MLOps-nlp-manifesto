@@ -12,75 +12,36 @@ def build_stopwords() -> list[str]:
     french_stopwords = set(stopwords.words("french"))
 
     extra_stopwords = {
-        "cevipof",
-        "fonds",
-        "circonscription",
-        "elections",
-        "législatives",
-        "tour",
-        "candidat",
-        "candidats",
-        "suppléant",
-        "suppléants",
-        "maire",
-        "conseiller",
-        "ans",
-        "comme",
-        "contre",
-        "faire",
-        "fait",
-        "faut",
-        "ceux",
-        "leurs",
-        "depuis",
-        "tout",
-        "tous",
-        "être",
-        "falloir",
-        "vouloir",
-        "mettre",
-        "donner",
-        "die",
-        "der",
-        "und",
-        "für",
-        "den",
-        "sie",
-        "eine",
-        "das",
-        "wir",
-        "werden",
-        "auf",
-        "nicht",
-        "einer",
-        "dass",
-        "gegen",
-        "ihr",
-        "auch",
-        "mit",
-        "von",
-        "ist",
-        "dem",
-        "ein",
-        "ich",
-        "sich",
-        "wird",
-        "haben",
-        "durch",
-        "ihre",
-        "als",
-        "frankreich",
-        "leben",
-        "sind",
-        "mehr",
-        "einen",
-        "politik",
-        "mehrheit",
-        "hat",
-        "geben",
-        "juni",
-        "alsace",
-        "strasbourg",
+
+        # Archive artifacts
+        "cevipof", "fonds",
+
+        # Election formatting
+        "circonscription", "elections", "législatives", "tour",
+
+        # Candidate biography
+        "candidat", "candidats", "suppléant", "suppléants",
+        "maire", "conseiller", "ans",
+
+        # Weak rhetorical words
+        "comme", "contre", "faire", "fait", "faut",
+        "ceux", "leurs", "depuis", "tout", "tous",
+        "être", "falloir", "vouloir", "mettre", "donner",
+
+        # OCR artifacts (German)
+        "die", "der", "und", "für", "den", "sie", "eine", "das",
+        "wir", "werden", "auf", "nicht", "einer", "dass", "gegen",
+        "ihr", "auch", "mit", "von", "ist", "dem", "ein", "ich",
+        "sich", "wird", "haben", "durch", "ihre", "als",
+        "frankreich", "leben", "sind", "mehr", "einen", "politik",
+        "mehrheit", "hat", "geben", "juni",
+
+        # Geographic artifacts
+        "alsace", "strasbourg",
+
+        # Formatting tokens
+        "mai", "juin", "mars", "plus",
+        "monsieur", "madame", "mademoiselle",
     }
 
     return list(french_stopwords.union(extra_stopwords))
@@ -129,3 +90,15 @@ def extract_topics(
         rows.append({"topic_id": topic_idx, "top_words": ", ".join(top_words)})
 
     return pd.DataFrame(rows)
+
+
+def generate_topic_labels(topics_df: pd.DataFrame) -> dict[str, str]:
+    """Generate simple human-readable labels from top words per topic."""
+    topic_labels = {}
+
+    for _, row in topics_df.iterrows():
+        topic_id = int(row["topic_id"])
+        top_words = str(row["top_words"]).split(", ")
+        topic_labels[str(topic_id)] = "_".join(top_words[:3])
+
+    return topic_labels

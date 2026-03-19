@@ -1,4 +1,4 @@
-"""Train baseline LDA topic model on French electoral manifestos."""
+"""Train and save an LDA topic model for French electoral manifestos."""
 
 from __future__ import annotations
 
@@ -9,7 +9,12 @@ from dotenv import load_dotenv
 
 from src.data.save_outputs import save_outputs
 from src.features.prepare_data import load_and_prepare_data
-from src.models.topic_model import build_stopwords, extract_topics, train_topic_model
+from src.models.topic_model import (
+    build_stopwords,
+    extract_topics,
+    generate_topic_labels,
+    train_topic_model,
+)
 from src.preprocessing.cleaning import build_processed_texts
 from src.utils.config import get_spacy_model, parse_args, validate_inputs
 from src.utils.logging_config import setup_logging
@@ -75,6 +80,9 @@ def main() -> None:
         top_n=args.top_n_words,
     )
 
+    logger.info("Generating topic labels")
+    topic_labels = generate_topic_labels(topics_df)
+
     logger.info("Saving outputs")
     save_outputs(
         df=df,
@@ -86,11 +94,15 @@ def main() -> None:
         experiment_name=args.experiment_name,
         args=args,
         spacy_model=spacy_model,
+        topic_labels=topic_labels,
     )
 
     logger.info("Training finished successfully")
-    logger.info("Outputs saved under: %s/%s",
-                args.output_dir, args.experiment_name)
+    logger.info(
+        "Outputs saved under: %s/%s",
+        args.output_dir,
+        args.experiment_name,
+    )
 
 
 if __name__ == "__main__":
