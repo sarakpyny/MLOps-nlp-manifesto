@@ -30,23 +30,23 @@ data → preprocessing → feature preparation → modeling → outputs → usag
 
 ```text
 PROJECT/
-├── app/                    # Future API or application layer
-├── deployment/             # Deployment-related files
+├── app/                    # FastAPI application (Phase 8)
+├── deployment/             # Deployment-related files (future)
 ├── notebooks/              # Exploration only (not used in production)
 ├── src/
 │   ├── data/               # Data loading and output saving
 │   ├── preprocessing/      # Text and metadata cleaning
 │   ├── features/           # Dataset preparation and filtering
 │   ├── models/             # Topic modeling logic
-│   ├── analysis/           # Analytical modules (future)
-│   ├── inference/          # Load trained artifacts and predict on new text
-│   └── utils/              # CLI config and shared utilities
-├── tests/                  # Unit tests (including inference tests)
+│   ├── analysis/           # Analytical modules
+│   ├── inference/          # Load trained artifacts and predict
+│   └── utils/              # Logging and shared utilities
+├── tests/                  # Unit and API tests
 ├── logs/                   # Log files (ignored by Git)
 ├── train.py                # Training pipeline entry point
-├── pyproject.toml          # Project dependencies (Phase 5)
-├── uv.lock                 # Locked environment (Phase 5)
-├── install.sh              # One-command setup (Phase 5)
+├── pyproject.toml          # Dependencies (uv)
+├── uv.lock                 # Locked environment
+├── install.sh              # One-command setup
 ├── requirements.txt        # Legacy dependency list
 └── README.md
 ```
@@ -61,6 +61,8 @@ Clone the repository and rebuild the environment:
 
 ```bash
 git clone https://github.com/sarakpyny/MLOps-nlp-manifesto.git
+cd MLOps-nlp-manifesto
+
 bash install.sh
 source .venv/bin/activate
 cp .env.example .env
@@ -117,8 +119,6 @@ These must be provided locally and are ignored by Git.
 
 ## Usage
 
-The training pipeline is executed from `train.py`, which orchestrates reusable modules inside `src/`.
-
 ### Run baseline (fast, no lemmatization)
 
 ```bash
@@ -150,13 +150,6 @@ uv run python train.py \
 
 ## Inference
 
-The project now separates training and inference:
-
-* `train.py` builds and saves model artifacts
-* `src/inference/` loads saved artifacts and predicts on new text
-
-Example usage:
-
 ```bash
 from pathlib import Path
 from src.inference.predictor import predict_topics
@@ -167,6 +160,23 @@ result = predict_topics(
 )
 
 print(result)
+```
+
+## API
+
+Run the API
+
+```bash
+uv run uvicorn app.api:app --reload
+
+```
+
+```bash
+Example:
+curl -X POST "<http://127.0.0.1:8000/predict_topics>" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Nous voulons défendre la justice sociale."}'
+
 ```
 
 ---
@@ -255,11 +265,17 @@ uv run pytest -v
   * output structure
   * probability validity
 
+## Phase 8 — API
+
+* Built FastAPI app (app/api.py)
+* Added endpoints for prediction and analysis
+* Added API tests (TestClient)
+* Enabled Swagger UI
+
 ## Next Steps
 
 * Add CI/CD workflows (`.github/workflows/`)
 * Introduce experiment tracking (MLflow)
-* Create API with FastAPI (`app/`)
 * Containerize with Docker (`deployment/`)
 
 ## Users
