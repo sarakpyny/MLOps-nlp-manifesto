@@ -15,7 +15,6 @@ venv/
 # Outputs / artifacts
 outputs/
 logs/
-models/
 artifacts/
 mlruns/
 *.joblib
