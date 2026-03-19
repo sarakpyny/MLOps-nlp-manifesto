@@ -28,8 +28,6 @@ data → preprocessing → feature preparation → modeling → outputs → usag
 
 ```text
 
----
-
 ## Project Structure
 
 ```text
@@ -59,7 +57,7 @@ PROJECT/
 
 ## Installation
 
-### Recommended setup (with uv)
+### Recommended setup
 
 Clone the repository and rebuild the environment:
 
@@ -150,6 +148,20 @@ uv run python train.py \
   --use-lemmatization
 ```
 
+## Outputs
+
+Each run creates a structured output folder:
+
+```text
+outputs/<experiment_name>/
+├── data_topics.csv
+├── topics_summary.csv
+├── lda_model.joblib
+├── vectorizer.joblib
+├── run_config.json
+└── topic_labels.json
+```
+
 ---
 
 ## Inference
@@ -201,20 +213,6 @@ curl -X POST "<http://127.0.0.1:8000/predict_topics>" \
 ```
 
 ---
-
-## Outputs
-
-Each run creates a structured output folder:
-
-```text
-outputs/<experiment_name>/
-├── data_topics.csv
-├── topics_summary.csv
-├── lda_model.joblib
-├── vectorizer.joblib
-├── run_config.json
-└── topic_labels.json
-```
 
 ## Testing
 
