@@ -4,28 +4,39 @@
 
 This project analyzes whether political discourse in French electoral manifestos is primarily structured by **party ideology** or by **candidates' socio-professional characteristics**.
 
-Using manifesto texts from the Archelec archive (Sciences Po / CEVIPOF), we apply **topic modeling (LDA)** and **regression analysis** to measure how much variation in political themes is explained by party, profession, and year.
+Using manifesto texts from the Archelec archive (Sciences Po / CEVIPOF), we apply **topic modeling (LDA)** to extract themes and quantify how they vary across parties, professions, and time.
 
 ---
 
-## Phase 0 — Initialization
+## MLOps Objective
 
-This repository is initialized from a previous NLP project.
+The goal of this project is to transform a research-style NLP notebook into a **reproducible, modular, and deployable machine learning system**.
 
-* `main` preserves the initial checkpoint
-* `mlops` is the working branch
-* notebooks are kept for **exploration only**
+The system follows a full pipeline:
+
+```
+data → preprocessing → feature preparation → modeling → outputs → usage
+```
 
 ---
 
 ## Project Structure
 
-```
+```text
 PROJECT/
-├── data/                  # Raw input data
-├── notebooks/             # Exploration only
-├── outputs/               # Saved artifacts from train.py
-├── train.py               # Phase 2 terminal baseline
+├── app/                    # Future API or application layer
+├── deployment/             # Deployment-related files
+├── notebooks/              # Exploration only (not used in production)
+├── src/
+│   ├── data/               # Data loading and output saving
+│   ├── preprocessing/      # Text and metadata cleaning
+│   ├── features/           # Dataset preparation and filtering
+│   ├── models/             # Topic modeling logic
+│   ├── analysis/           # Analytical modules (future)
+│   ├── inference/          # Inference pipeline (future)
+│   └── utils/              # CLI config and shared utilities
+├── tests/                  # Unit tests (future)
+├── train.py                # Main pipeline entry point
 ├── requirements.txt
 └── README.md
 ```
@@ -33,6 +44,8 @@ PROJECT/
 ---
 
 ## Installation
+
+Create and activate your environment, then install dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -43,73 +56,22 @@ cp .env.example .env
 
 ---
 
-## Phase 1 — MLOps Product Scope
+## Data
 
-### Problem
+The pipeline expects:
 
-Determine whether manifesto topics are better explained by **party affiliation** or **profession**.
+* **Metadata CSV** (e.g. `data/archelect_search.csv`)
+* **Text files directory** (e.g. `data/text_files/`)
 
-### Input
-
-* Manifesto texts
-* Metadata such as:
-  * political party
-  * profession
-  * election year
-  * additional candidate attributes when available
-
-### Processing
-
-* Load manifesto corpus
-* Merge metadata
-* Clean and filter texts
-* Lemmatize text
-* Train a topic model
-* Produce document-topic outputs
-
-### Output
-
-* Topic distributions by document
-* Topic keyword summaries
-* Cleaned corpus with metadata
-* Saved model artifacts
-
-### Users
-
-* Instructors
-* Researchers
-* Political science users
-* Data science students
-
-### Usage
-
-* Batch execution from terminal
-* API / dashboard in later phases
-
-### System
-
-**data → preprocessing → topic modeling → outputs → usage**
+These are ignored in Git (`.gitignore`) and must be provided locally.
 
 ---
 
-## Phase 2 — Terminal Baseline Pipeline
+## Usage
 
-The first executable baseline replaces notebook-only execution with a single script that runs end to end from the terminal.
+The training pipeline is executed from `train.py`, which orchestrates reusable modules inside `src/`.
 
-### Goal
-
-Build one minimal pipeline that:
-
-* loads manifesto texts
-* merges metadata
-* cleans and filters texts
-* trains one topic model
-* generates outputs
-* saves artifacts locally
-
-### Run the baseline topic-model training
-
-Run it fast, without lemmatization:
+### Run baseline (fast, no lemmatization)
 
 ```bash
 python train.py \
@@ -120,9 +82,9 @@ python train.py \
   --random-seed 42 \
   --output-dir outputs \
   --experiment-name baseline_lda
-  ```
+```
 
-Run it with lemmatization:
+### Run with lemmatization
 
 ```bash
 python train.py \
@@ -134,16 +96,89 @@ python train.py \
   --output-dir outputs \
   --experiment-name baseline_lda_lemma \
   --use-lemmatization
-  ```
+```
 
-## Phase 3 — Clean and parameterized script
+---
 
-This phase removes notebook-style hidden parameters and makes the pipeline configurable from the terminal.
+## Outputs
 
-Main improvements:
+Each run creates a structured output folder:
 
-* CLI parameters with `argparse`
-* `.env.example` for environment configuration
-* helper functions for repeated logic
-* cleaner output organization by experiment name
-* linting with Ruff and PyLint
+```text
+outputs/<experiment_name>/
+├── data_topics.csv        # Document-topic distributions
+├── topics_summary.csv     # Top words per topic
+├── lda_model.joblib       # Trained LDA model
+├── vectorizer.joblib      # CountVectorizer
+└── run_config.json        # Parameters used for the run
+```
+
+---
+
+## MLOps Phases
+
+### Phase 0 — Initialization
+
+* Project initialized from an NLP notebook-based repository
+* `main` branch preserved as baseline
+* `mlops` branch used for development
+
+### Phase 1 — Product Definition
+
+* Defined problem, inputs, outputs, and users
+* Framed as a full ML system
+
+### Phase 2 — Baseline Pipeline
+
+* Created `train.py` script
+* End-to-end execution from terminal
+
+### Phase 3 — Parameterization
+
+* Added CLI arguments with `argparse`
+* Introduced `.env` configuration
+* Improved reproducibility and logging
+
+### Phase 4 — Modular Structure (current)
+
+* Refactored code into `src/` modules
+* Separated:
+
+  * data loading
+  * preprocessing
+  * feature preparation
+  * modeling
+  * output saving
+* `train.py` now handles orchestration only
+* Prepared project for testing, API, and deployment
+
+---
+
+## Next Steps
+
+Planned improvements in future phases:
+
+* Add unit tests (`tests/`)
+* Introduce experiment tracking (MLflow)
+* Build inference pipeline (`src/inference/`)
+* Create API with FastAPI (`app/`)
+* Add CI/CD workflows (`.github/workflows/`)
+* Containerize with Docker (`deployment/`)
+
+---
+
+## Users
+
+* Data science students
+* Researchers in political science
+* Instructors
+
+---
+
+## Notes
+
+* Notebooks are for **exploration only**
+* The pipeline is designed to be **fully reproducible from the command line**
+* Data is not included in the repository
+
+---

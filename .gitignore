@@ -1,9 +1,13 @@
 # Python
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 .venv/
 venv/
 .ruff_cache/
+.pytest_cache/
+.mypy_cache/
 
 # Environment
 .env
