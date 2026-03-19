@@ -1,0 +1,18 @@
+[project]
+name = "party-influence-manifestos"
+version = "0.1.0"
+description = "MLOps project for analyzing party influence in French electoral manifestos"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "joblib~=1.5.3",
+    "nltk~=3.9.3",
+    "numpy~=2.4.3",
+    "pandas~=3.0.1",
+    "python-dotenv~=1.1.1",
+    "scikit-learn~=1.8.0",
+    "spacy~=3.8.11",
+]
+
+[tool.uv]
+package = false

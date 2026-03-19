@@ -37,7 +37,10 @@ PROJECT/
 │   └── utils/              # CLI config and shared utilities
 ├── tests/                  # Unit tests (future)
 ├── train.py                # Main pipeline entry point
-├── requirements.txt
+├── pyproject.toml          # Project dependencies (Phase 5)
+├── uv.lock                 # Locked environment (Phase 5)
+├── install.sh              # One-command setup (Phase 5)
+├── requirements.txt        # Legacy dependency list
 └── README.md
 ```
 
@@ -45,14 +48,53 @@ PROJECT/
 
 ## Installation
 
-Create and activate your environment, then install dependencies:
+### Recommended setup (with uv)
+
+Clone the repository and rebuild the environment:
 
 ```bash
-pip install -r requirements.txt
-python -m spacy download fr_core_news_md
-python -c "import nltk; nltk.download('stopwords')"
+git clone <your-repo-url>
+cd PROJECT
+bash install.sh
+source .venv/bin/activate
 cp .env.example .env
 ```
+
+### Manual setup
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+export PATH="$HOME/.local/bin:$PATH"
+
+uv sync
+source .venv/bin/activate
+
+uv run python -m spacy download fr_core_news_md
+uv run python -c "import nltk; nltk.download('stopwords')"
+
+cp .env.example .env
+```
+
+---
+
+## Reproducibility
+
+This project is designed to run on another machine without hidden dependencies.
+
+The repository includes:
+
+* `pyproject.toml` for explicit dependency declaration
+* `uv.lock` for reproducible environments
+* `install.sh` for automatic setup
+* `.env.example` for configuration transparency
+
+The following are intentionally **not versioned**:
+
+* raw data (`data/`)
+* outputs (`outputs/`)
+* model artifacts (`*.joblib`)
+* logs
+* secrets (`.env`)
 
 ---
 
@@ -63,7 +105,7 @@ The pipeline expects:
 * **Metadata CSV** (e.g. `data/archelect_search.csv`)
 * **Text files directory** (e.g. `data/text_files/`)
 
-These are ignored in Git (`.gitignore`) and must be provided locally.
+These must be provided locally and are ignored by Git.
 
 ---
 
@@ -74,7 +116,7 @@ The training pipeline is executed from `train.py`, which orchestrates reusable m
 ### Run baseline (fast, no lemmatization)
 
 ```bash
-python train.py \
+uv run python train.py \
   --n-topics 8 \
   --min-doc-length 100 \
   --start-year 1981 \
@@ -87,7 +129,7 @@ python train.py \
 ### Run with lemmatization
 
 ```bash
-python train.py \
+uv run python train.py \
   --n-topics 8 \
   --min-doc-length 100 \
   --start-year 1981 \
@@ -106,11 +148,11 @@ Each run creates a structured output folder:
 
 ```text
 outputs/<experiment_name>/
-├── data_topics.csv        # Document-topic distributions
-├── topics_summary.csv     # Top words per topic
-├── lda_model.joblib       # Trained LDA model
-├── vectorizer.joblib      # CountVectorizer
-└── run_config.json        # Parameters used for the run
+├── data_topics.csv
+├── topics_summary.csv
+├── lda_model.joblib
+├── vectorizer.joblib
+└── run_config.json
 ```
 
 ---
@@ -139,18 +181,20 @@ outputs/<experiment_name>/
 * Introduced `.env` configuration
 * Improved reproducibility and logging
 
-### Phase 4 — Modular Structure (current)
+### Phase 4 — Modular Structure
 
 * Refactored code into `src/` modules
-* Separated:
+* Separated data, preprocessing, features, modeling, and outputs
+* `train.py` handles orchestration only
 
-  * data loading
-  * preprocessing
-  * feature preparation
-  * modeling
-  * output saving
-* `train.py` now handles orchestration only
-* Prepared project for testing, API, and deployment
+### Phase 5 — Reproducibility First (current)
+
+* Added `pyproject.toml` for explicit dependency management
+* Added `uv.lock` for locked reproducible environments
+* Added `install.sh` for one-command setup
+* Added `.env.example` for transparent configuration
+* Strengthened `.gitignore` to exclude data, outputs, models, logs, and secrets
+* Updated installation instructions for portability
 
 ---
 
@@ -180,5 +224,3 @@ Planned improvements in future phases:
 * Notebooks are for **exploration only**
 * The pipeline is designed to be **fully reproducible from the command line**
 * Data is not included in the repository
-
----

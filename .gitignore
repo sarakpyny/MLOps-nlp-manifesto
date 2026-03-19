@@ -9,13 +9,19 @@ venv/
 .pytest_cache/
 .mypy_cache/
 
-# Environment
+# Environment / secrets
 .env
 
 # Outputs / artifacts
 outputs/
 logs/
+models/
+artifacts/
+mlruns/
 *.joblib
+*.pkl
+*.pickle
+*.skops
 
 # Data
 data/
@@ -27,4 +33,10 @@ data/
 
 # Editor / OS
 .vscode/
+.idea/
 .DS_Store
+
+# Future website / Quarto artifacts
+.quarto/
+_site/
+*_files/
