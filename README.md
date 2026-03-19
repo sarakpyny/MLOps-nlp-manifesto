@@ -53,8 +53,7 @@ PROJECT/
 Clone the repository and rebuild the environment:
 
 ```bash
-git clone <your-repo-url>
-cd PROJECT
+git clone <https://github.com/sarakpyny/MLOps-nlp-manifesto.git>
 bash install.sh
 source .venv/bin/activate
 cp .env.example .env
