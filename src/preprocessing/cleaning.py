@@ -1,11 +1,14 @@
 """Text and metadata cleaning utilities."""
 
+import logging
 import re
 import unicodedata
 
 import numpy as np
 import pandas as pd
 import spacy
+
+logger = logging.getLogger(__name__)
 
 
 def remove_accents(text: str) -> str:
@@ -124,8 +127,8 @@ def build_processed_texts(
     normalized_texts = normalize_text_series(texts)
 
     if use_lemmatization:
-        print("Lemmatizing texts...")
+        logger.info("Lemmatizing texts")
         return lemmatize_series(normalized_texts, spacy_model)
 
-    print("Skipping lemmatization and using normalized raw text...")
+    logger.info("Skipping lemmatization and using normalized raw text")
     return normalized_texts

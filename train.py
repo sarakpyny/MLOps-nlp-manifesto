@@ -1,5 +1,8 @@
 """Train baseline LDA topic model on French electoral manifestos."""
 
+from __future__ import annotations
+
+import logging
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -9,17 +12,26 @@ from src.features.prepare_data import load_and_prepare_data
 from src.models.topic_model import build_stopwords, extract_topics, train_topic_model
 from src.preprocessing.cleaning import build_processed_texts
 from src.utils.config import get_spacy_model, parse_args, validate_inputs
+from src.utils.logging_config import setup_logging
 
 
 def main() -> None:
     """Run the end-to-end training pipeline."""
     load_dotenv()
+    setup_logging()
+    logger = logging.getLogger(__name__)
+
     args = parse_args()
     validate_inputs(args)
 
-    spacy_model = get_spacy_model(args.spacy_model)
+    logger.info("Starting training pipeline")
+    logger.info("Experiment name: %s", args.experiment_name)
+    logger.info("Lemmatization enabled: %s", args.use_lemmatization)
 
-    print("Loading and preparing data...")
+    spacy_model = get_spacy_model(args.spacy_model)
+    logger.info("Loaded spaCy model: %s", args.spacy_model)
+
+    logger.info("Loading and preparing data")
     df = load_and_prepare_data(
         metadata_path=Path(args.metadata_path),
         text_files_path=Path(args.text_files_path),
@@ -28,22 +40,25 @@ def main() -> None:
         end_year=args.end_year,
     )
 
+    logger.info("Prepared dataframe with %s rows", len(df))
+
     if df.empty:
+        logger.error("No documents available after filtering")
         raise ValueError(
             "No documents available after filtering. Check your parameters."
         )
 
-    print("Preparing text data...")
+    logger.info("Preparing text data")
     df["text_processed"] = build_processed_texts(
         texts=df["text"],
         use_lemmatization=args.use_lemmatization,
         spacy_model=spacy_model,
     )
 
-    print("Building stopwords...")
+    logger.info("Building stopwords")
     stop_words = build_stopwords()
 
-    print("Training topic model...")
+    logger.info("Training topic model with %s topics", args.n_topics)
     lda, vectorizer, doc_topics = train_topic_model(
         texts=df["text_processed"],
         n_topics=args.n_topics,
@@ -53,14 +68,14 @@ def main() -> None:
         random_seed=args.random_seed,
     )
 
-    print("Extracting topics...")
+    logger.info("Extracting topics")
     topics_df = extract_topics(
         model=lda,
         vectorizer=vectorizer,
         top_n=args.top_n_words,
     )
 
-    print("Saving outputs...")
+    logger.info("Saving outputs")
     save_outputs(
         df=df,
         doc_topics=doc_topics,
@@ -73,11 +88,9 @@ def main() -> None:
         spacy_model=spacy_model,
     )
 
-    print("Training finished")
-    print(f"Experiment: {args.experiment_name}")
-    print(f"Lemmatization enabled: {args.use_lemmatization}")
-    print("Outputs generated")
-    print("Model artifacts saved")
+    logger.info("Training finished successfully")
+    logger.info("Outputs saved under: %s/%s",
+                args.output_dir, args.experiment_name)
 
 
 if __name__ == "__main__":

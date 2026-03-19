@@ -40,3 +40,7 @@ data/
 .quarto/
 _site/
 *_files/
+
+# Logs
+logs/
+*.log
