@@ -1,10 +1,10 @@
 """Dataset preparation functions for manifesto modeling."""
 
-from pathlib import Path
+from __future__ import annotations
 
 import pandas as pd
 
-from src.data.load_data import load_metadata, merge_metadata_with_texts
+from src.data.load_data import load_manifestos_raw
 from src.preprocessing.cleaning import clean_metadata_columns
 
 
@@ -47,15 +47,13 @@ def select_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def load_and_prepare_data(
-    metadata_path: Path,
-    text_files_path: Path,
     min_doc_length: int,
     start_year: int,
     end_year: int,
+    url_raw: str | None = None,
 ) -> pd.DataFrame:
-    """Load metadata and texts, then prepare a filtered training dataset."""
-    metadata = load_metadata(metadata_path)
-    df = merge_metadata_with_texts(metadata, text_files_path)
+    """Load prepared Parquet data, then prepare a filtered training dataset."""
+    df = load_manifestos_raw(url=url_raw)
     df = filter_documents(df, min_doc_length, start_year, end_year)
     df = clean_metadata_columns(df)
     return select_columns(df)
