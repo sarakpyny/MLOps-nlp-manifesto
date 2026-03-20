@@ -38,13 +38,10 @@ def main() -> None:
 
     logger.info("Loading and preparing data")
     df = load_and_prepare_data(
-        metadata_path=Path(args.metadata_path),
-        text_files_path=Path(args.text_files_path),
         min_doc_length=args.min_doc_length,
         start_year=args.start_year,
         end_year=args.end_year,
     )
-
     logger.info("Prepared dataframe with %s rows", len(df))
 
     if df.empty:
