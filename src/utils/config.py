@@ -93,6 +93,12 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Enable spaCy lemmatization. By default, raw text is used for faster runs.",
     )
+    parser.add_argument(
+        "--url-raw",
+        type=str,
+        default=None,
+        help="Remote Parquet dataset URL. If omitted, URL_RAW is read from .env.",
+    )
 
     return parser.parse_args()
 
