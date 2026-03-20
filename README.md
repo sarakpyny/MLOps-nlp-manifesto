@@ -19,7 +19,7 @@ The goal of this project is to transform a research-style NLP notebook into a **
 The system follows a full pipeline:
 
 ```text
-raw data → merged dataset → preprocessing → feature preparation → modeling → outputs → inference/API
+data → preprocessing → feature preparation → modeling → outputs → usage
 
 ```
 
