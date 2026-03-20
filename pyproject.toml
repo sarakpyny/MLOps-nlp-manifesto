@@ -1,5 +1,5 @@
 [project]
-name = "party-influence-manifestos"
+name = "mlops-manifestos"
 version = "0.1.0"
 description = "MLOps project for analyzing party influence in French electoral manifestos"
 readme = "README.md"
