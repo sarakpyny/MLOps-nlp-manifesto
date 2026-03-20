@@ -1,21 +1,32 @@
 #!/usr/bin/env bash
-set -e
+set -Eeuo pipefail
 
-echo "Updating system packages..."
-sudo apt-get -y update
+need_cmd() {
+  command -v "$1" >/dev/null 2>&1
+}
 
-echo "Installing system dependencies..."
-sudo apt-get install -y python3-pip python3-venv curl
+if ! need_cmd python3; then
+  echo "python3 is required but not installed."
+  exit 1
+fi
 
-echo "Installing uv..."
-curl -LsSf https://astral.sh/uv/install.sh | sh
-export PATH="$HOME/.local/bin:$PATH"
+if ! need_cmd curl; then
+  echo "curl is required but not installed."
+  exit 1
+fi
+
+if ! need_cmd uv; then
+  echo "Installing uv..."
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  export PATH="$HOME/.local/bin:$PATH"
+  export PATH="$HOME/.cargo/bin:$PATH"
+fi
 
 echo "Syncing project environment..."
 uv sync
 
 echo "Bootstrapping pip inside .venv..."
-uv run python -m ensurepip --upgrade
+uv run python -m ensurepip --upgrade || true
 uv run python -m pip install --upgrade pip
 
 echo "Installing spaCy French model..."
@@ -25,7 +36,5 @@ echo "Downloading NLTK stopwords..."
 uv run python -c "import nltk; nltk.download('stopwords')"
 
 echo "Done."
-echo "Activate the environment with:"
 echo "source .venv/bin/activate"
-echo "Then copy config with:"
 echo "cp .env.example .env"
