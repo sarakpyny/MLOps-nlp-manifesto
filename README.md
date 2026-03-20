@@ -4,9 +4,9 @@
 
 This project analyzes whether political discourse in French electoral manifestos is primarily structured by **party ideology** or by **candidates' socio-professional characteristics**.
 
-Using manifesto texts from the Archelec archive (Sciences Po / CEVIPOF), we apply **topic modeling (LDA)** to extract themes and quantify how they vary across parties, professions, and time.
+Using manifesto texts from the Archelec archive (Sciences Po / CEVIPOF), the project applies **topic modeling (LDA)** to extract themes and quantify how they vary across parties, professions, and time.
 
-This project is adapted from the original NLP work:  
+This project is adapted from the original NLP work:
 
 <https://github.com/sarakpyny/NLP-Course-Ensae/tree/main/Project>
 
@@ -18,15 +18,12 @@ The goal of this project is to transform a research-style NLP notebook into a **
 
 The system follows a full pipeline:
 
-```bash
-data → preprocessing → feature preparation → modeling → outputs → usage
+```text
+raw data → merged dataset → preprocessing → feature preparation → modeling → outputs → inference/API
+
 ```
 
 ---
-
-## Project Structure
-
-```text
 
 ## Project Structure
 
@@ -264,6 +261,11 @@ uv run pytest -v
 * Strengthened `.gitignore` to exclude data, outputs, models, logs, and secrets
 * Updated installation instructions for portability
 
+### Phase 5bis — Externalized Data Layer
+
+* Exported the merged dataset to CSV and Parquet
+* Updated training and feature preparation to rely on the external Parquet dataset instead of local raw files
+
 ---
 
 ## Phase 6 — Logging & Tests
@@ -296,6 +298,7 @@ uv run pytest -v
 * Add CI/CD workflows (`.github/workflows/`)
 * Introduce experiment tracking (MLflow)
 * Containerize with Docker (`deployment/`)
+* Add automated validation for external dataset availability
 
 ## Users
 
