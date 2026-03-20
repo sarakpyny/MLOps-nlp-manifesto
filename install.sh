@@ -1,19 +1,10 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-need_cmd() {
-  command -v "$1" >/dev/null 2>&1
-}
+need_cmd() { command -v "$1" >/dev/null 2>&1; }
 
-if ! need_cmd python3; then
-  echo "python3 is required but not installed."
-  exit 1
-fi
-
-if ! need_cmd curl; then
-  echo "curl is required but not installed."
-  exit 1
-fi
+need_cmd python3 || { echo "python3 is required."; exit 1; }
+need_cmd curl || { echo "curl is required."; exit 1; }
 
 if ! need_cmd uv; then
   echo "Installing uv..."
@@ -25,15 +16,11 @@ fi
 echo "Syncing project environment..."
 uv sync
 
-echo "Bootstrapping pip inside .venv..."
-uv run python -m ensurepip --upgrade || true
-uv run python -m pip install --upgrade pip
-
 echo "Installing spaCy French model..."
-uv run python -m spacy download fr_core_news_md
+uv pip install fr_core_news_md
 
 echo "Downloading NLTK stopwords..."
-uv run python -c "import nltk; nltk.download('stopwords')"
+uv run python -c "import nltk; nltk.download('stopwords', quiet=True)"
 
 echo "Done."
 echo "source .venv/bin/activate"

@@ -107,10 +107,16 @@ The following are intentionally **not versioned**:
 
 ## Data
 
-The pipeline expects:
-
 * **Metadata CSV** (e.g. `data/archelect_search.csv`)
 * **Text files directory** (e.g. `data/text_files/`)
+
+### Prepared dataset
+
+The training pipeline reads a merged Parquet dataset from external object storage:
+
+```bash
+https://minio.lab.sspcloud.fr/sny/mlops-manifesto/processed/manifestos_raw.parquet
+```
 
 These must be provided locally and are ignored by Git.
 

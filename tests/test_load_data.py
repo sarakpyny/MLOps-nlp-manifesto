@@ -1,41 +1,56 @@
-"""Tests for raw data loading and merge helpers."""
-
-from pathlib import Path
+"""Tests for Parquet data loading."""
 
 import pandas as pd
 
-from src.data.load_data import load_text_files, merge_metadata_with_texts
+from src.data.load_data import load_manifestos_raw
 
 
-def test_load_text_files_reads_txt_files(tmp_path: Path):
-    """Text loader should read .txt files and use filename stem as key."""
-    file_a = tmp_path / "123.txt"
-    file_b = tmp_path / "456.txt"
+def test_load_manifestos_raw_uses_explicit_url(monkeypatch):
+    """Loader should read from the provided Parquet URL."""
+    expected = pd.DataFrame({"text": ["hello"], "label": ["A"]})
+    captured = {}
 
-    file_a.write_text("texte un", encoding="utf-8")
-    file_b.write_text("texte deux", encoding="utf-8")
+    class FakeResult:
+        def df(self):
+            return expected
 
-    text_dict = load_text_files(tmp_path)
+    class FakeConn:
+        def execute(self, query):
+            captured["query"] = query
+            return FakeResult()
 
-    assert text_dict == {
-        "123": "texte un",
-        "456": "texte deux",
-    }
+    import src.data.load_data as mod
+
+    monkeypatch.setattr(mod.duckdb, "connect",
+                        lambda database=":memory:": FakeConn())
+
+    result = load_manifestos_raw("dummy.parquet")
+
+    assert result.equals(expected)
+    assert "dummy.parquet" in captured["query"]
 
 
-def test_merge_metadata_with_texts_keeps_only_matching_rows(tmp_path: Path):
-    """Merge should keep only metadata rows with matching text files."""
-    (tmp_path / "1.txt").write_text("manifeste 1", encoding="utf-8")
-    (tmp_path / "2.txt").write_text("manifeste 2", encoding="utf-8")
+def test_load_manifestos_raw_uses_env_url(monkeypatch):
+    """Loader should fall back to URL_RAW from the environment."""
+    expected = pd.DataFrame({"text": ["bonjour"]})
+    captured = {}
 
-    metadata = pd.DataFrame(
-        {
-            "id": [1, 2, 3],
-            "date": ["1981-01-01", "1982-01-01", "1983-01-01"],
-        }
-    )
+    class FakeResult:
+        def df(self):
+            return expected
 
-    merged = merge_metadata_with_texts(metadata, tmp_path)
+    class FakeConn:
+        def execute(self, query):
+            captured["query"] = query
+            return FakeResult()
 
-    assert merged["id"].tolist() == [1, 2]
-    assert merged["text"].tolist() == ["manifeste 1", "manifeste 2"]
+    import src.data.load_data as mod
+
+    monkeypatch.setattr(mod.duckdb, "connect",
+                        lambda database=":memory:": FakeConn())
+    monkeypatch.setenv("URL_RAW", "env_dataset.parquet")
+
+    result = load_manifestos_raw()
+
+    assert result.equals(expected)
+    assert "env_dataset.parquet" in captured["query"]
