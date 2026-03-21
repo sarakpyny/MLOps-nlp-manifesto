@@ -13,15 +13,21 @@ if ! need_cmd uv; then
   export PATH="$HOME/.cargo/bin:$PATH"
 fi
 
-echo "Syncing project environment..."
-uv sync
+echo "Syncing project environment with dev dependencies..."
+uv sync --dev
+
+echo "Bootstrapping pip inside .venv..."
+uv run python -m ensurepip --upgrade
+uv run python -m pip install --upgrade pip
 
 echo "Installing spaCy French model..."
-uv pip install fr_core_news_md
+uv run python -m pip install fr_core_news_md
 
 echo "Downloading NLTK stopwords..."
 uv run python -c "import nltk; nltk.download('stopwords', quiet=True)"
 
 echo "Done."
+echo "Activate the environment with:"
 echo "source .venv/bin/activate"
+echo "Then copy config with:"
 echo "cp .env.example .env"
