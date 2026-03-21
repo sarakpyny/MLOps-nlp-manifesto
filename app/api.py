@@ -38,7 +38,6 @@ app = FastAPI(
     title=APP_NAME,
     version=APP_VERSION,
     description="API for French electoral manifesto topic inference and analytical summaries.",
-    root_path="/proxy/8000",
 )
 
 
