@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlops-manifestos-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlops-manifestos-api
+  template:
+    metadata:
+      labels:
+        app: mlops-manifestos-api
+    spec:
+      containers:
+        - name: mlops-manifestos-api
+          image: nysarakpy/mlops-manifestos-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: URL_RAW
+              value: "https://minio.lab.sspcloud.fr/sny/mlops-manifesto/processed/manifestos_raw.parquet"
