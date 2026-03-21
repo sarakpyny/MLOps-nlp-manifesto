@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mlops-manifestos-api-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: mlops-manifestos-api.lab.sspcloud.fr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mlops-manifestos-api-service
+                port:
+                  number: 80
