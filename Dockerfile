@@ -14,7 +14,6 @@ RUN uv sync --frozen
 
 COPY app ./app
 COPY src ./src
-COPY outputs ./outputs
 
 EXPOSE 8000
 
