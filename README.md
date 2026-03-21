@@ -1,5 +1,9 @@
 # Party Influence in French Electoral Manifestos
 
+[![CI Tests](https://github.com/sarakpyny/MLOps-nlp-manifesto/actions/workflows/test.yml/badge.svg)](https://github.com/sarakpyny/MLOps-nlp-manifesto/actions/workflows/test.yml)
+[![Docker Image](https://github.com/sarakpyny/MLOps-nlp-manifesto/actions/workflows/docker.yml/badge.svg)](https://github.com/sarakpyny/MLOps-nlp-manifesto/actions/workflows/docker.yml)
+[![Docker Hub](https://img.shields.io/docker/pulls/nysarakpy/mlops-manifestos-api)](https://hub.docker.com/r/nysarakpy/mlops-manifestos-api)
+
 ## Project Overview
 
 This project analyzes whether political discourse in French electoral manifestos is primarily structured by **party ideology** or by **candidates' socio-professional characteristics**.
@@ -29,8 +33,8 @@ data → preprocessing → feature preparation → modeling → outputs → usag
 
 ```text
 PROJECT/
-├── app/                    # FastAPI application (Phase 8)
-├── deployment/             # Deployment-related files (future)
+├── app/                    # FastAPI application
+├── deployment/             # Deployment-related files
 ├── notebooks/              # Exploration only (not used in production)
 ├── src/
 │   ├── data/               # Data loading and output saving
@@ -41,15 +45,16 @@ PROJECT/
 │   ├── inference/          # Load trained artifacts and predict
 │   └── utils/              # Logging and shared utilities
 ├── tests/                  # Unit and API tests
+├── .github/workflows/      # GitHub Actions CI/CD workflows
 ├── logs/                   # Log files (ignored by Git)
 ├── outputs/                # Saved experiment artifacts (ignored by Git)
-├── Dockerfile              # Container definition (Phase 9)
+├── Dockerfile              # Container definition
 ├── train.py                # Training pipeline entry point
-├── pyproject.toml          # Dependencies (uv)
+├── pyproject.toml          # Dependencies managed with uv
 ├── uv.lock                 # Locked environment
-├── install.sh              # One-command setup
-├── requirements.txt        # Legacy dependency list
-└── README.md
+├── install.sh              # One-command local setup
+├── README.md
+└── .env.example           # Example configuration
 ```
 
 ---
@@ -109,18 +114,14 @@ The following are intentionally **not versioned**:
 
 ## Data
 
-* **Metadata CSV** (e.g. `data/archelect_search.csv`)
-* **Text files directory** (e.g. `data/text_files/`)
-
-### Prepared dataset
-
-The training pipeline reads a merged Parquet dataset from external object storage:
+The training pipeline reads a merged Parquet dataset from external object storage S3:
 
 ```bash
 https://minio.lab.sspcloud.fr/sny/mlops-manifesto/processed/manifestos_raw.parquet
+
 ```
 
-These must be provided locally and are ignored by Git.
+This URL is provided through the environment variable URL_RAW.
 
 ---
 
@@ -219,19 +220,27 @@ curl -X POST "<http://127.0.0.1:8000/predict_topics>" \
 
 ---
 
-### Docker
+## Docker
 
-#### Build the image
+### Build locally
 
 ```bash
-docker build -t mlops-manifestos-api .
+docker build \
+  --build-arg URL_RAW="https://minio.lab.sspcloud.fr/sny/mlops-manifesto/processed/manifestos_raw.parquet" \
+  -t mlops-manifestos-api .
+
 ```
 
-#### Run the container
+Run local image:
 
 ```bash
 docker run -p 8000:8000 mlops-manifestos-api
+```
 
+Pull published image:
+
+```bash
+docker pull nysarakpy/mlops-manifestos-api:latest
 ```
 
 Swagger UI:
@@ -240,6 +249,19 @@ Swagger UI:
 http://127.0.0.1:8000/docs
 
 ```
+
+## CI/CD
+
+This project includes two GitHub Actions workflows:
+
+* `test.yml` Recreates the environment, installs required NLP resources, builds test artifacts, runs Ruff, PyLint, and pytest.
+* `docker.yml` Builds and publishes the Docker image to Docker Hub.
+
+Required GitHub secrets
+
+* `URL_RAW`
+* `DOCKERHUB_USERNAME`
+* `DOCKERHUB_TOKEN`
 
 ## Testing
 
@@ -329,9 +351,14 @@ uv run pytest -v
 * Built a runnable image for the FastAPI application
 * Packaged dependencies, source code, and saved artifacts in the container
 
+## Phase 10 — CI/CD Automation
+
+* Added GitHub Actions workflows under `.github/workflows/`
+* Automated Docker image build and publication to Docker Hub
+* Made runtime dependencies explicit in CI and Docker builds
+
 ## Next Steps
 
-* Add CI/CD workflows (`.github/workflows/`)
 * Introduce experiment tracking (MLflow)
 * Containerize with Docker (`deployment/`)
 * Add automated validation for external dataset availability
