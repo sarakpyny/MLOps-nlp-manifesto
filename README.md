@@ -34,7 +34,7 @@ data → preprocessing → feature preparation → modeling → outputs → usag
 ```text
 PROJECT/
 ├── app/                    # FastAPI application
-├── deployment/             # Deployment-related files
+├── deployment/             # Kubernetes deployment manifests
 ├── notebooks/              # Exploration only (not used in production)
 ├── src/
 │   ├── data/               # Data loading and output saving
@@ -54,7 +54,7 @@ PROJECT/
 ├── uv.lock                 # Locked environment
 ├── install.sh              # One-command local setup
 ├── README.md
-└── .env.example           # Example configuration
+└── .env.example            # Example configuration
 ```
 
 ---
@@ -186,26 +186,25 @@ print(result)
 
 ## API
 
-### Run the API
+### Run API locally
 
 ```bash
 uv run uvicorn app.api:app --reload
 
 ```
 
-### Access interactive
+### Documentation
 
 #### Local
 
 ```bash
-
 http://127.0.0.1:8000/docs
 ```
 
-#### Remote
+#### Live deployed API
 
-```bash
-https://<your-instance>/proxy/8000/docs
+```bahs
+https://manifesto-api-sny.lab.sspcloud.fr/docs
 ```
 
 Example:
@@ -219,6 +218,17 @@ curl -X POST "<http://127.0.0.1:8000/predict_topics>" \
 ```
 
 ---
+
+## Deployment
+
+The FastAPI application is deployed on SSP Cloud with a Kubernetes-based setup managed through ArgoCD.
+
+Live endpoints
+
+```bash
+Swagger UI: https://manifesto-api-sny.lab.sspcloud.fr/docs
+
+```
 
 ## Docker
 
@@ -357,10 +367,15 @@ uv run pytest -v
 * Automated Docker image build and publication to Docker Hub
 * Made runtime dependencies explicit in CI and Docker builds
 
+## Phase 11 — Deployment
+
+* Deployed the FastAPI application on SSP Cloud
+* Exposed a live API URL
+* Made Swagger documentation reachable online at /docs
+
 ## Next Steps
 
 * Introduce experiment tracking (MLflow)
-* Containerize with Docker (`deployment/`)
 * Add automated validation for external dataset availability
 
 ## Users
