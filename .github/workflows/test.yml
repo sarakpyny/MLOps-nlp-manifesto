@@ -39,7 +39,7 @@ jobs:
         run: .venv/bin/python -m pip install fr_core_news_md
 
       - name: Build baseline artifacts for tests
-        run: uv run python train.py --experiment_name baseline_lda
+        run: uv run python train.py --experiment-name baseline_lda
 
       - name: Run Ruff
         run: uv run ruff check .
