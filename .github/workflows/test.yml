@@ -13,6 +13,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      URL_RAW: ${{ secrets.URL_RAW }}
 
     steps:
       - name: Checkout repository
