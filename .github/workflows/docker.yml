@@ -35,3 +35,5 @@ jobs:
             push: ${{ github.event_name != 'pull_request' }}
             platforms: linux/amd64,linux/arm64
             tags: nysarakpy/mlops-manifestos-api:latest
+            build-args: |
+                URL_RAW=${{ secrets.URL_RAW }}

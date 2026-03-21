@@ -12,8 +12,19 @@ ENV PATH="/root/.local/bin:$PATH"
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen
 
+RUN .venv/bin/python -m ensurepip --upgrade && \
+    .venv/bin/python -m pip install --upgrade pip && \
+    .venv/bin/python -m pip install fr_core_news_md && \
+    .venv/bin/python -c "import nltk; nltk.download('stopwords', quiet=True)"
+
 COPY app ./app
 COPY src ./src
+COPY train.py ./train.py
+
+ARG URL_RAW
+ENV URL_RAW=${URL_RAW}
+
+RUN uv run python train.py --experiment-name baseline_lda
 
 EXPOSE 8000
 
