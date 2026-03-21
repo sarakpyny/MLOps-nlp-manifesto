@@ -42,6 +42,8 @@ PROJECT/
 │   └── utils/              # Logging and shared utilities
 ├── tests/                  # Unit and API tests
 ├── logs/                   # Log files (ignored by Git)
+├── outputs/                # Saved experiment artifacts (ignored by Git)
+├── Dockerfile              # Container definition (Phase 9)
 ├── train.py                # Training pipeline entry point
 ├── pyproject.toml          # Dependencies (uv)
 ├── uv.lock                 # Locked environment
@@ -217,6 +219,28 @@ curl -X POST "<http://127.0.0.1:8000/predict_topics>" \
 
 ---
 
+### Docker
+
+#### Build the image
+
+```bash
+docker build -t mlops-manifestos-api .
+```
+
+#### Run the container
+
+```bash
+docker run -p 8000:8000 mlops-manifestos-api
+
+```
+
+Swagger UI:
+
+```bash
+http://127.0.0.1:8000/docs
+
+```
+
 ## Testing
 
 Run the full test suite:
@@ -298,6 +322,12 @@ uv run pytest -v
 * Added endpoints for prediction and analysis
 * Added API tests (TestClient)
 * Enabled Swagger UI
+
+## Phase 9 — Containerization
+
+* Added a Dockerfile
+* Built a runnable image for the FastAPI application
+* Packaged dependencies, source code, and saved artifacts in the container
 
 ## Next Steps
 
