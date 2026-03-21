@@ -29,6 +29,12 @@ jobs:
       - name: Sync dependencies
         run: uv sync --dev
 
+      - name: Install spaCy French model
+        run: uv run python -m spacy download fr_core_news_md
+
+      - name: Build baseline artifacts for tests
+        run: uv run python train.py --experiment_name baseline_lda
+
       - name: Run Ruff
         run: uv run ruff check .
 
