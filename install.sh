@@ -17,14 +17,14 @@ echo "Syncing project environment with dev dependencies..."
 uv sync --dev
 
 echo "Bootstrapping pip inside .venv..."
-uv run python -m ensurepip --upgrade
-uv run python -m pip install --upgrade pip
+.venv/bin/python -m ensurepip --upgrade
+.venv/bin/python -m pip install --upgrade pip
 
 echo "Installing spaCy French model..."
-uv run python -m pip install fr_core_news_md
+.venv/bin/python -m pip install fr_core_news_md
 
 echo "Downloading NLTK stopwords..."
-uv run python -c "import nltk; nltk.download('stopwords', quiet=True)"
+.venv/bin/python -c "import nltk; nltk.download('stopwords', quiet=True)"
 
 echo "Done."
 echo "Activate the environment with:"

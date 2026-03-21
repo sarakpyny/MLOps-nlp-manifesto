@@ -2,17 +2,23 @@
 
 import numpy as np
 import pandas as pd
+import nltk
 from nltk.corpus import stopwords
+from nltk.data import find
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import CountVectorizer
 
 
 def build_stopwords() -> list[str]:
     """Build the stopword list used by the CountVectorizer."""
+    try:
+        find("corpora/stopwords")
+    except LookupError:
+        nltk.download("stopwords", quiet=True)
+
     french_stopwords = set(stopwords.words("french"))
 
     extra_stopwords = {
-
         # Archive artifacts
         "cevipof", "fonds",
 
