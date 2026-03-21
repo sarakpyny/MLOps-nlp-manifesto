@@ -29,8 +29,14 @@ jobs:
       - name: Sync dependencies
         run: uv sync --dev
 
+      - name: Bootstrap pip inside .venv
+        run: .venv/bin/python -m ensurepip --upgrade
+
+      - name: Upgrade pip inside .venv
+        run: .venv/bin/python -m pip install --upgrade pip
+
       - name: Install spaCy French model
-        run: uv run python -m spacy download fr_core_news_md
+        run: .venv/bin/python -m pip install fr_core_news_md
 
       - name: Build baseline artifacts for tests
         run: uv run python train.py --experiment_name baseline_lda
