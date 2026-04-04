@@ -1,0 +1,54 @@
+---
+title: "Architecture"
+---
+
+## System architecture
+
+The project is structured as an end-to-end MLOps pipeline:
+
+`data -> preprocessing -> features -> modeling -> outputs -> inference -> API -> deployment`
+
+## Main components
+
+The repository is organized into clearly separated modules:
+
+- `train.py` orchestrates the training pipeline
+- `src/data/` handles data loading and output saving
+- `src/preprocessing/` handles text and metadata cleaning
+- `src/features/` prepares filtered datasets
+- `src/models/` contains topic modeling logic
+- `src/inference/` loads saved artifacts and predicts on new text
+- `app/api.py` exposes the FastAPI service
+- `deployment/` contains Kubernetes deployment manifests
+
+## Workflow diagram
+
+```{mermaid}
+flowchart LR
+    A[External Parquet dataset] --> B[train.py]
+    B --> C[Preprocessing]
+    C --> D[Feature preparation]
+    D --> E[LDA topic model]
+    E --> F[Saved artifacts in outputs/]
+    F --> G[Inference layer]
+    G --> H[FastAPI API]
+    H --> I[Docker container]
+    I --> J[CI/CD workflows]
+    J --> K[Kubernetes deployment]
+```
+
+## Deployment flow
+The project includes:
+       * reproducible local execution with uv
+       * automated tests with GitHub Actions
+       * Docker image build and publication
+       * deployment on SSP Cloud
+       * public API documentation through Swagger UI
+## Why this architecture matters
+
+This structure separates experimentation from production use.
+The training pipeline creates reusable artifacts, the inference layer loads them for prediction, and the API exposes the model to external users without requiring them to run the full pipeline themselves.
+
+## Current deployment target
+The FastAPI application is deployed online and exposed through a public Swagger interface:
+https://manifesto-api-sny.lab.sspcloud.fr/docs

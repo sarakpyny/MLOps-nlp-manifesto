@@ -1,0 +1,36 @@
+project:
+  type: website
+  output-dir: docs
+  render:
+    - index.qmd
+    - dataset.qmd
+    - method.qmd
+    - api.qmd
+    - architecture.qmd
+    - results.qmd
+
+website:
+  title: "Party Influence in French Electoral Manifestos"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: dataset.qmd
+        text: Dataset
+      - href: method.qmd
+        text: Method
+      - href: api.qmd
+        text: API
+      - href: architecture.qmd
+        text: Architecture
+      - href: results.qmd
+        text: Results
+    right:
+      - icon: github
+        href: https://github.com/sarakpyny/MLOps-nlp-manifesto
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true

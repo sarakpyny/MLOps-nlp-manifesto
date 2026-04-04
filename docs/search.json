@@ -1,0 +1,296 @@
+[
+  {
+    "objectID": "results.html",
+    "href": "results.html",
+    "title": "Results",
+    "section": "",
+    "text": "This page presents the main outputs of the baseline LDA experiment.\nThe objective of the model is to identify recurring themes in French electoral manifestos and make them interpretable through topic summaries and topic distributions."
+  },
+  {
+    "objectID": "results.html#overview",
+    "href": "results.html#overview",
+    "title": "Results",
+    "section": "",
+    "text": "This page presents the main outputs of the baseline LDA experiment.\nThe objective of the model is to identify recurring themes in French electoral manifestos and make them interpretable through topic summaries and topic distributions."
+  },
+  {
+    "objectID": "results.html#baseline-experiment-outputs",
+    "href": "results.html#baseline-experiment-outputs",
+    "title": "Results",
+    "section": "Baseline experiment outputs",
+    "text": "Baseline experiment outputs\nThe baseline run produces the following artifacts under outputs/baseline_lda/:\n\ndata_topics.csv\ntopics_summary.csv\nlda_model.joblib\nvectorizer.joblib\nrun_config.json\ntopic_labels.json\n\nThese artifacts support both interpretation and reuse in inference and API serving."
+  },
+  {
+    "objectID": "results.html#topic-summaries",
+    "href": "results.html#topic-summaries",
+    "title": "Results",
+    "section": "Topic summaries",
+    "text": "Topic summaries\nThe file topics_summary.csv contains one row per topic with the most representative words.\n\nDiscovered topics\n\n\n\n\n\n\n\nTopic ID\nTop words\n\n\n\n\n0\nfrance, social, majorité, françois, mitterrand, uni, président, progrès, socialiste, français\n\n\n1\npolitique, gauche, social, droit, emploi, travail, nouveau, pouvoir, voter, droite\n\n\n2\nnational, front, vote, français, voter, député, rpr, udf, force, avenir\n\n\n3\nnational, général, emploi, france, français, politique, député, union, homme, social\n\n\n4\nfrançais, national, liberté, france, public, front, pays, populaire, enseignement, majorité\n\n\n5\nécologie, vert, écologiste, entente, vie, ecologiste, environnement, politique, ecologie, nouveau\n\n\n6\nsocialiste, france, majorité, union, liberté, français, politique, nouveau, voter, parti\n\n\n7\ncommuniste, gauche, droite, politique, parti, force, français, changement, majorité, voix"
+  },
+  {
+    "objectID": "results.html#interpretation-notes",
+    "href": "results.html#interpretation-notes",
+    "title": "Results",
+    "section": "Interpretation notes",
+    "text": "Interpretation notes\nSome thematic patterns are already visible from the top words:\n\nTopic 5 is clearly associated with ecology and environmental discourse.\nTopic 7 appears linked to communist and left-right party language.\nTopics 2 and 4 seem related to nationalist or right-wing political framing.\nTopics 0 and 6 appear closer to socialist or majority-party discourse.\nSeveral topics combine ideological vocabulary with electoral and institutional terms such as vote, député, président, and majorité.\n\nThese interpretations are exploratory and should be read as aids to understanding the topic model rather than fixed labels."
+  },
+  {
+    "objectID": "results.html#what-the-model-returns",
+    "href": "results.html#what-the-model-returns",
+    "title": "Results",
+    "section": "What the model returns",
+    "text": "What the model returns\nThe experiment produces:\n\na topic distribution for each manifesto\na most likely topic for each text\na summary of topic keywords\nreusable artifacts for prediction on new text"
+  },
+  {
+    "objectID": "results.html#link-with-the-api",
+    "href": "results.html#link-with-the-api",
+    "title": "Results",
+    "section": "Link with the API",
+    "text": "Link with the API\nThe same saved artifacts are reused in the inference layer and exposed through the FastAPI application.\nThis means the website, the training pipeline, and the deployed API all rely on the same baseline experiment outputs."
+  },
+  {
+    "objectID": "results.html#next-improvement",
+    "href": "results.html#next-improvement",
+    "title": "Results",
+    "section": "Next improvement",
+    "text": "Next improvement\nA stronger presentation layer could add:\n\na chart of topic prevalence across the corpus\na comparison by political party\na comparison by socio-professional category\none or two concrete manifesto examples with predicted topic distributions"
+  },
+  {
+    "objectID": "api.html",
+    "href": "api.html",
+    "title": "API usage",
+    "section": "",
+    "text": "The project includes a FastAPI application that exposes topic inference for new manifesto-like text inputs.\nThis makes the trained topic model accessible to users who do not need to run the full training pipeline."
+  },
+  {
+    "objectID": "api.html#overview",
+    "href": "api.html#overview",
+    "title": "API usage",
+    "section": "",
+    "text": "The project includes a FastAPI application that exposes topic inference for new manifesto-like text inputs.\nThis makes the trained topic model accessible to users who do not need to run the full training pipeline."
+  },
+  {
+    "objectID": "api.html#run-locally",
+    "href": "api.html#run-locally",
+    "title": "API usage",
+    "section": "Run locally",
+    "text": "Run locally\nuv run uvicorn app.api:app --reload\nDocumentation Local Swagger UI: http://127.0.0.1:8000/docs Deployed Swagger UI: https://manifesto-api-sny.lab.sspcloud.fr/docs\nExample request\ncurl -X POST \"http://127.0.0.1:8000/predict_topics\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"text\": \"Nous voulons défendre la justice sociale.\"}'\nExample response Add here a real JSON response captured from the API, for example:\n{\n  \"processed_text\": \"vouloir défendre justice social service public\",\n  \"top_topic_id\": 4,\n  \"top_topic_label\": \"français_national_liberté\",\n  \"top_topic_score\": 0.8539606046385947,\n  \"topic_distribution\": [\n    0.020875688261488397,\n    0.02086718061520562,\n    0.020850240568247337,\n    0.02087238559487796,\n    0.8539606046385947,\n    0.020851844617826007,\n    0.02085487065904547,\n    0.020867185044714447\n  ]\n}\nTypical usage The API can be used to: * test new manifesto excerpts * inspect topic probabilities * integrate the model into other applications * demonstrate the deployed inference layer"
+  },
+  {
+    "objectID": "dataset.html",
+    "href": "dataset.html",
+    "title": "Dataset",
+    "section": "",
+    "text": "This project analyzes French electoral manifestos using a processed dataset built from the Archelec archive.\nThe objective is to study how manifesto themes vary across political parties, socio-professional characteristics, and election years."
+  },
+  {
+    "objectID": "dataset.html#overview",
+    "href": "dataset.html#overview",
+    "title": "Dataset",
+    "section": "",
+    "text": "This project analyzes French electoral manifestos using a processed dataset built from the Archelec archive.\nThe objective is to study how manifesto themes vary across political parties, socio-professional characteristics, and election years."
+  },
+  {
+    "objectID": "dataset.html#data-source",
+    "href": "dataset.html#data-source",
+    "title": "Dataset",
+    "section": "Data source",
+    "text": "Data source\nThe original manifesto material comes from the Archelec archive developed by Sciences Po / CEVIPOF.\nIn this MLOps version of the project, the training pipeline does not read raw files directly from the repository. Instead, it loads a merged dataset from external object storage."
+  },
+  {
+    "objectID": "dataset.html#pipeline-input",
+    "href": "dataset.html#pipeline-input",
+    "title": "Dataset",
+    "section": "Pipeline input",
+    "text": "Pipeline input\nThe training pipeline reads a Parquet file provided through the URL_RAW environment variable.\nThis design keeps the repository lightweight while making the project reproducible on another machine."
+  },
+  {
+    "objectID": "dataset.html#what-the-dataset-contains",
+    "href": "dataset.html#what-the-dataset-contains",
+    "title": "Dataset",
+    "section": "What the dataset contains",
+    "text": "What the dataset contains\nThe working dataset combines:\n\nmanifesto text\nelection year information\nparty-related metadata\nsocio-professional metadata\ncleaned text fields used in preprocessing and modeling\n\nThese fields allow the project to connect textual themes with political and candidate characteristics."
+  },
+  {
+    "objectID": "dataset.html#why-parquet-is-used",
+    "href": "dataset.html#why-parquet-is-used",
+    "title": "Dataset",
+    "section": "Why Parquet is used",
+    "text": "Why Parquet is used\nThe processed dataset is stored in Parquet format because it is efficient for tabular data workflows and convenient for reproducible machine learning pipelines.\nIt is also easier to reuse in training than a collection of heterogeneous raw source files."
+  },
+  {
+    "objectID": "dataset.html#what-is-not-versioned-in-git",
+    "href": "dataset.html#what-is-not-versioned-in-git",
+    "title": "Dataset",
+    "section": "What is not versioned in Git",
+    "text": "What is not versioned in Git\nTo keep the repository clean and portable, the following elements are intentionally not stored in version control:\n\nraw data files\nprocessed outputs\ntrained model artifacts\nlogs\nsecrets and local environment files"
+  },
+  {
+    "objectID": "dataset.html#reproducibility-note",
+    "href": "dataset.html#reproducibility-note",
+    "title": "Dataset",
+    "section": "Reproducibility note",
+    "text": "Reproducibility note\nThe repository includes the code, configuration, and environment definition needed to rerun the pipeline, while the dataset itself is accessed externally through a declared configuration variable.\nThis separation is important for reproducibility, deployment, and collaboration."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Party Influence in French Electoral Manifestos",
+    "section": "",
+    "text": "This project studies whether French electoral manifestos are shaped more strongly by party ideology or by candidates’ socio-professional characteristics.\nUsing manifesto texts from the Archelec archive, the project applies topic modeling with Latent Dirichlet Allocation (LDA) to identify recurring themes in political discourse across parties, professions, and election years."
+  },
+  {
+    "objectID": "index.html#project-overview",
+    "href": "index.html#project-overview",
+    "title": "Party Influence in French Electoral Manifestos",
+    "section": "",
+    "text": "This project studies whether French electoral manifestos are shaped more strongly by party ideology or by candidates’ socio-professional characteristics.\nUsing manifesto texts from the Archelec archive, the project applies topic modeling with Latent Dirichlet Allocation (LDA) to identify recurring themes in political discourse across parties, professions, and election years."
+  },
+  {
+    "objectID": "index.html#from-research-project-to-mlops-system",
+    "href": "index.html#from-research-project-to-mlops-system",
+    "title": "Party Influence in French Electoral Manifestos",
+    "section": "From research project to MLOps system",
+    "text": "From research project to MLOps system\nThe initial work began as an NLP analysis project. It was then transformed into a reproducible and deployable machine learning system.\nThe pipeline covers the full workflow:\ndata -&gt; preprocessing -&gt; feature preparation -&gt; modeling -&gt; outputs -&gt; inference -&gt; API"
+  },
+  {
+    "objectID": "index.html#why-this-project-matters",
+    "href": "index.html#why-this-project-matters",
+    "title": "Party Influence in French Electoral Manifestos",
+    "section": "Why this project matters",
+    "text": "Why this project matters\nPolitical manifestos are useful documents for studying how parties and candidates frame public issues.\nThis project makes that analysis:\n\nreproducible from the command line\nmodular and testable\nreusable through saved artifacts\naccessible through an API\ndeployable in a cloud environment"
+  },
+  {
+    "objectID": "index.html#main-research-question",
+    "href": "index.html#main-research-question",
+    "title": "Party Influence in French Electoral Manifestos",
+    "section": "Main research question",
+    "text": "Main research question\nAre manifesto themes explained more by:\n\npolitical party affiliation?\nor socio-professional background?"
+  },
+  {
+    "objectID": "index.html#what-this-website-contains",
+    "href": "index.html#what-this-website-contains",
+    "title": "Party Influence in French Electoral Manifestos",
+    "section": "What this website contains",
+    "text": "What this website contains\nThis documentation website presents:\n\nthe dataset used in the pipeline\nthe modeling approach\nthe deployed API\nthe system architecture\nthe main experiment results"
+  },
+  {
+    "objectID": "index.html#intended-users",
+    "href": "index.html#intended-users",
+    "title": "Party Influence in French Electoral Manifestos",
+    "section": "Intended users",
+    "text": "Intended users\nThis project is designed for:\n\ndata science students\npolitical science researchers\ninstructors"
+  },
+  {
+    "objectID": "index.html#project-links",
+    "href": "index.html#project-links",
+    "title": "Party Influence in French Electoral Manifestos",
+    "section": "Project links",
+    "text": "Project links\n\nGitHub repository\nLive API documentation"
+  },
+  {
+    "objectID": "index.html#summary",
+    "href": "index.html#summary",
+    "title": "Party Influence in French Electoral Manifestos",
+    "section": "Summary",
+    "text": "Summary\nThis project shows how an academic NLP workflow can be refactored into a complete MLOps system with reproducibility, modularity, testing, deployment, and public-facing documentation."
+  },
+  {
+    "objectID": "method.html",
+    "href": "method.html",
+    "title": "Method",
+    "section": "",
+    "text": "The project follows a modular NLP and MLOps pipeline:\n\ndata loading\ntext preprocessing\ndataset preparation and filtering\ntopic modeling with LDA\nartifact export\ninference on new text\nAPI serving with FastAPI"
+  },
+  {
+    "objectID": "method.html#overview",
+    "href": "method.html#overview",
+    "title": "Method",
+    "section": "",
+    "text": "The project follows a modular NLP and MLOps pipeline:\n\ndata loading\ntext preprocessing\ndataset preparation and filtering\ntopic modeling with LDA\nartifact export\ninference on new text\nAPI serving with FastAPI"
+  },
+  {
+    "objectID": "method.html#input-data",
+    "href": "method.html#input-data",
+    "title": "Method",
+    "section": "Input data",
+    "text": "Input data\nThe training pipeline reads a merged Parquet dataset from external object storage.\nThe input contains manifesto text together with metadata used for filtering and downstream analysis."
+  },
+  {
+    "objectID": "method.html#preprocessing",
+    "href": "method.html#preprocessing",
+    "title": "Method",
+    "section": "Preprocessing",
+    "text": "Preprocessing\nThe preprocessing stage prepares manifesto texts for modeling.\nDepending on the experiment configuration, the pipeline can run in a baseline mode or in a version with lemmatization."
+  },
+  {
+    "objectID": "method.html#feature-preparation",
+    "href": "method.html#feature-preparation",
+    "title": "Method",
+    "section": "Feature preparation",
+    "text": "Feature preparation\nBefore modeling, the dataset is filtered using experiment parameters such as:\n\nnumber of topics\nminimum document length\nstart year\nend year\nrandom seed\n\nThese settings are recorded for reproducibility."
+  },
+  {
+    "objectID": "method.html#modeling-choice",
+    "href": "method.html#modeling-choice",
+    "title": "Method",
+    "section": "Modeling choice",
+    "text": "Modeling choice\nThe project uses Latent Dirichlet Allocation (LDA) to discover latent themes in manifesto texts.\nLDA is appropriate here because the goal is not supervised prediction, but the extraction of interpretable thematic structure from political discourse."
+  },
+  {
+    "objectID": "method.html#saved-artifacts",
+    "href": "method.html#saved-artifacts",
+    "title": "Method",
+    "section": "Saved artifacts",
+    "text": "Saved artifacts\nEach experiment produces reusable outputs, including:\n\ntopic assignments by document\ntopic summaries\ntrained LDA model\nvectorizer\nrun configuration\nhuman-readable topic labels"
+  },
+  {
+    "objectID": "method.html#inference",
+    "href": "method.html#inference",
+    "title": "Method",
+    "section": "Inference",
+    "text": "Inference\nSaved artifacts are loaded from an experiment directory and reused to infer topic probabilities on new text inputs.\nThis makes the project usable beyond training, including through the API layer."
+  },
+  {
+    "objectID": "architecture.html",
+    "href": "architecture.html",
+    "title": "Architecture",
+    "section": "",
+    "text": "The project is structured as an end-to-end MLOps pipeline:\ndata -&gt; preprocessing -&gt; features -&gt; modeling -&gt; outputs -&gt; inference -&gt; API -&gt; deployment"
+  },
+  {
+    "objectID": "architecture.html#system-architecture",
+    "href": "architecture.html#system-architecture",
+    "title": "Architecture",
+    "section": "",
+    "text": "The project is structured as an end-to-end MLOps pipeline:\ndata -&gt; preprocessing -&gt; features -&gt; modeling -&gt; outputs -&gt; inference -&gt; API -&gt; deployment"
+  },
+  {
+    "objectID": "architecture.html#main-components",
+    "href": "architecture.html#main-components",
+    "title": "Architecture",
+    "section": "Main components",
+    "text": "Main components\nThe repository is organized into clearly separated modules:\n\ntrain.py orchestrates the training pipeline\nsrc/data/ handles data loading and output saving\nsrc/preprocessing/ handles text and metadata cleaning\nsrc/features/ prepares filtered datasets\nsrc/models/ contains topic modeling logic\nsrc/inference/ loads saved artifacts and predicts on new text\napp/api.py exposes the FastAPI service\ndeployment/ contains Kubernetes deployment manifests"
+  },
+  {
+    "objectID": "architecture.html#workflow-diagram",
+    "href": "architecture.html#workflow-diagram",
+    "title": "Architecture",
+    "section": "Workflow diagram",
+    "text": "Workflow diagram\n\n\n\n\n\nflowchart LR\n    A[External Parquet dataset] --&gt; B[train.py]\n    B --&gt; C[Preprocessing]\n    C --&gt; D[Feature preparation]\n    D --&gt; E[LDA topic model]\n    E --&gt; F[Saved artifacts in outputs/]\n    F --&gt; G[Inference layer]\n    G --&gt; H[FastAPI API]\n    H --&gt; I[Docker container]\n    I --&gt; J[CI/CD workflows]\n    J --&gt; K[Kubernetes deployment]"
+  },
+  {
+    "objectID": "architecture.html#deployment-flow",
+    "href": "architecture.html#deployment-flow",
+    "title": "Architecture",
+    "section": "Deployment flow",
+    "text": "Deployment flow\nThe project includes: * reproducible local execution with uv * automated tests with GitHub Actions * Docker image build and publication * deployment on SSP Cloud * public API documentation through Swagger UI ## Why this architecture matters\nThis structure separates experimentation from production use. The training pipeline creates reusable artifacts, the inference layer loads them for prediction, and the API exposes the model to external users without requiring them to run the full pipeline themselves."
+  },
+  {
+    "objectID": "architecture.html#current-deployment-target",
+    "href": "architecture.html#current-deployment-target",
+    "title": "Architecture",
+    "section": "Current deployment target",
+    "text": "Current deployment target\nThe FastAPI application is deployed online and exposed through a public Swagger interface: https://manifesto-api-sny.lab.sspcloud.fr/docs"
+  }
+]

@@ -1,0 +1,63 @@
+---
+title: "Party Influence in French Electoral Manifestos"
+---
+
+## Project overview
+
+This project studies whether French electoral manifestos are shaped more strongly by **party ideology** or by **candidates' socio-professional characteristics**.
+
+Using manifesto texts from the **Archelec archive**, the project applies **topic modeling with Latent Dirichlet Allocation (LDA)** to identify recurring themes in political discourse across parties, professions, and election years.
+
+## From research project to MLOps system
+
+The initial work began as an NLP analysis project. It was then transformed into a reproducible and deployable machine learning system.
+
+The pipeline covers the full workflow:
+
+`data -> preprocessing -> feature preparation -> modeling -> outputs -> inference -> API`
+
+## Why this project matters
+
+Political manifestos are useful documents for studying how parties and candidates frame public issues.
+
+This project makes that analysis:
+
+- reproducible from the command line
+- modular and testable
+- reusable through saved artifacts
+- accessible through an API
+- deployable in a cloud environment
+
+## Main research question
+
+Are manifesto themes explained more by:
+
+- political party affiliation?
+- or socio-professional background?
+
+## What this website contains
+
+This documentation website presents:
+
+- the dataset used in the pipeline
+- the modeling approach
+- the deployed API
+- the system architecture
+- the main experiment results
+
+## Intended users
+
+This project is designed for:
+
+- data science students
+- political science researchers
+- instructors
+
+## Project links
+
+- [GitHub repository](https://github.com/sarakpyny/MLOps-nlp-manifesto)
+- [Live API documentation](https://manifesto-api-sny.lab.sspcloud.fr/docs)
+
+## Summary
+
+This project shows how an academic NLP workflow can be refactored into a complete MLOps system with reproducibility, modularity, testing, deployment, and public-facing documentation.

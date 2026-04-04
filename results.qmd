@@ -1,0 +1,75 @@
+---
+title: "Results"
+---
+
+## Overview
+
+This page presents the main outputs of the baseline LDA experiment.
+
+The objective of the model is to identify recurring themes in French electoral manifestos and make them interpretable through topic summaries and topic distributions.
+
+## Baseline experiment outputs
+
+The baseline run produces the following artifacts under `outputs/baseline_lda/`:
+
+- `data_topics.csv`
+- `topics_summary.csv`
+- `lda_model.joblib`
+- `vectorizer.joblib`
+- `run_config.json`
+- `topic_labels.json`
+
+These artifacts support both interpretation and reuse in inference and API serving.
+
+## Topic summaries
+
+The file `topics_summary.csv` contains one row per topic with the most representative words.
+
+### Discovered topics
+
+| Topic ID | Top words |
+|---|---|
+| 0 | france, social, majorité, françois, mitterrand, uni, président, progrès, socialiste, français |
+| 1 | politique, gauche, social, droit, emploi, travail, nouveau, pouvoir, voter, droite |
+| 2 | national, front, vote, français, voter, député, rpr, udf, force, avenir |
+| 3 | national, général, emploi, france, français, politique, député, union, homme, social |
+| 4 | français, national, liberté, france, public, front, pays, populaire, enseignement, majorité |
+| 5 | écologie, vert, écologiste, entente, vie, ecologiste, environnement, politique, ecologie, nouveau |
+| 6 | socialiste, france, majorité, union, liberté, français, politique, nouveau, voter, parti |
+| 7 | communiste, gauche, droite, politique, parti, force, français, changement, majorité, voix |
+
+## Interpretation notes
+
+Some thematic patterns are already visible from the top words:
+
+- **Topic 5** is clearly associated with ecology and environmental discourse.
+- **Topic 7** appears linked to communist and left-right party language.
+- **Topics 2 and 4** seem related to nationalist or right-wing political framing.
+- **Topics 0 and 6** appear closer to socialist or majority-party discourse.
+- Several topics combine ideological vocabulary with electoral and institutional terms such as *vote*, *député*, *président*, and *majorité*.
+
+These interpretations are exploratory and should be read as aids to understanding the topic model rather than fixed labels.
+
+## What the model returns
+
+The experiment produces:
+
+- a topic distribution for each manifesto
+- a most likely topic for each text
+- a summary of topic keywords
+- reusable artifacts for prediction on new text
+
+## Link with the API
+
+The same saved artifacts are reused in the inference layer and exposed through the FastAPI application.
+
+This means the website, the training pipeline, and the deployed API all rely on the same baseline experiment outputs.
+
+## Next improvement
+
+A stronger presentation layer could add:
+
+- a chart of topic prevalence across the corpus
+- a comparison by political party
+- a comparison by socio-professional category
+- one or two concrete manifesto examples with predicted topic distributions

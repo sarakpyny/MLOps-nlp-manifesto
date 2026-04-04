@@ -1,0 +1,55 @@
+---
+title: "Dataset"
+---
+
+## Overview
+
+This project analyzes French electoral manifestos using a processed dataset built from the **Archelec archive**.
+
+The objective is to study how manifesto themes vary across political parties, socio-professional characteristics, and election years.
+
+## Data source
+
+The original manifesto material comes from the **Archelec archive** developed by Sciences Po / CEVIPOF.
+
+In this MLOps version of the project, the training pipeline does not read raw files directly from the repository. Instead, it loads a merged dataset from external object storage.
+
+## Pipeline input
+
+The training pipeline reads a Parquet file provided through the `URL_RAW` environment variable.
+
+This design keeps the repository lightweight while making the project reproducible on another machine.
+
+## What the dataset contains
+
+The working dataset combines:
+
+- manifesto text
+- election year information
+- party-related metadata
+- socio-professional metadata
+- cleaned text fields used in preprocessing and modeling
+
+These fields allow the project to connect textual themes with political and candidate characteristics.
+
+## Why Parquet is used
+
+The processed dataset is stored in **Parquet** format because it is efficient for tabular data workflows and convenient for reproducible machine learning pipelines.
+
+It is also easier to reuse in training than a collection of heterogeneous raw source files.
+
+## What is not versioned in Git
+
+To keep the repository clean and portable, the following elements are intentionally not stored in version control:
+
+- raw data files
+- processed outputs
+- trained model artifacts
+- logs
+- secrets and local environment files
+
+## Reproducibility note
+
+The repository includes the code, configuration, and environment definition needed to rerun the pipeline, while the dataset itself is accessed externally through a declared configuration variable.
+
+This separation is important for reproducibility, deployment, and collaboration.

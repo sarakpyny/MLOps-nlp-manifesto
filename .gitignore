@@ -43,3 +43,5 @@ _site/
 # Logs
 logs/
 *.log
+/.quarto/
+**/*.quarto_ipynb

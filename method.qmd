@@ -1,0 +1,62 @@
+---
+title: "Method"
+---
+
+## Overview
+
+The project follows a modular NLP and MLOps pipeline:
+
+1. data loading
+2. text preprocessing
+3. dataset preparation and filtering
+4. topic modeling with LDA
+5. artifact export
+6. inference on new text
+7. API serving with FastAPI
+
+## Input data
+
+The training pipeline reads a merged Parquet dataset from external object storage.
+
+The input contains manifesto text together with metadata used for filtering and downstream analysis.
+
+## Preprocessing
+
+The preprocessing stage prepares manifesto texts for modeling.
+
+Depending on the experiment configuration, the pipeline can run in a baseline mode or in a version with lemmatization.
+
+## Feature preparation
+
+Before modeling, the dataset is filtered using experiment parameters such as:
+
+- number of topics
+- minimum document length
+- start year
+- end year
+- random seed
+
+These settings are recorded for reproducibility.
+
+## Modeling choice
+
+The project uses **Latent Dirichlet Allocation (LDA)** to discover latent themes in manifesto texts.
+
+LDA is appropriate here because the goal is not supervised prediction, but the extraction of interpretable thematic structure from political discourse.
+
+## Saved artifacts
+
+Each experiment produces reusable outputs, including:
+
+- topic assignments by document
+- topic summaries
+- trained LDA model
+- vectorizer
+- run configuration
+- human-readable topic labels
+
+## Inference
+
+Saved artifacts are loaded from an experiment directory and reused to infer topic probabilities on new text inputs.
+
+This makes the project usable beyond training, including through the API layer.
