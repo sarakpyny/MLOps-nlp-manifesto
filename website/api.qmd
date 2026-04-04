@@ -15,14 +15,14 @@ uv run uvicorn app.api:app --reload
 ``` 
 
 ## Documentation
-
+Local Swagger UI: 
 ```bash
-Local Swagger UI: http://127.0.0.1:8000/docs
-```
-
+http://127.0.0.1:8000/docs
+``` 
+Deployed Swagger UI: 
 ```bash
-Deployed Swagger UI: https://manifesto-api-sny.lab.sspcloud.fr/docs
-```
+https://manifesto-api-sny.lab.sspcloud.fr/docs
+``` 
 
 ## Swagger interface
 
