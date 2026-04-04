@@ -217,6 +217,25 @@ curl -X POST "<http://127.0.0.1:8000/predict_topics>" \
 
 ```
 
+## Presentation Layer
+
+Phase 12 adds a public-facing documentation website built with Quarto and deployed on GitHub Pages.
+The website includes:
+
+* project overview
+* dataset description
+* method summary
+* API usage
+* architecture page
+
+results summary
+
+Live site:
+
+```bash
+https://sarakpyny.github.io/MLOps-nlp-manifesto/
+```
+
 ---
 
 ## Deployment
@@ -373,10 +392,18 @@ uv run pytest -v
 * Exposed a live API URL
 * Made Swagger documentation reachable online at /docs
 
+## Phase 12 — Presentation Layer
+
+* Added a Quarto documentation website
+* Published the site with GitHub Pages
+* Structured the presentation for non-technical users
+* Included project overview, dataset, method, API usage, architecture, and results summary
+
 ## Next Steps
 
 * Introduce experiment tracking (MLflow)
 * Add automated validation for external dataset availability
+* Enrich the website with additional result visualizations
 
 ## Users
 

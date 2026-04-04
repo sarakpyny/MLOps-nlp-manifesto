@@ -74,7 +74,14 @@
     "href": "api.html#run-locally",
     "title": "API usage",
     "section": "Run locally",
-    "text": "Run locally\nuv run uvicorn app.api:app --reload\nDocumentation Local Swagger UI: http://127.0.0.1:8000/docs Deployed Swagger UI: https://manifesto-api-sny.lab.sspcloud.fr/docs"
+    "text": "Run locally\nuv run uvicorn app.api:app --reload"
+  },
+  {
+    "objectID": "api.html#documentation",
+    "href": "api.html#documentation",
+    "title": "API usage",
+    "section": "Documentation",
+    "text": "Documentation\nLocal Swagger UI: http://127.0.0.1:8000/docs\nDeployed Swagger UI: https://manifesto-api-sny.lab.sspcloud.fr/docs"
   },
   {
     "objectID": "api.html#swagger-interface",
@@ -144,14 +151,14 @@
     "href": "index.html",
     "title": "Party Influence in French Electoral Manifestos",
     "section": "",
-    "text": "This project studies whether French electoral manifestos are shaped more strongly by party ideology or by candidates’ socio-professional characteristics.\nUsing manifesto texts from the Archelec archive, the project applies topic modeling with Latent Dirichlet Allocation (LDA) to identify recurring themes in political discourse across parties, professions, and election years."
+    "text": "This website presents the MLOps version of an NLP project on French electoral manifestos, including the dataset, method, architecture, API, and baseline results."
   },
   {
     "objectID": "index.html#project-overview",
     "href": "index.html#project-overview",
     "title": "Party Influence in French Electoral Manifestos",
-    "section": "",
-    "text": "This project studies whether French electoral manifestos are shaped more strongly by party ideology or by candidates’ socio-professional characteristics.\nUsing manifesto texts from the Archelec archive, the project applies topic modeling with Latent Dirichlet Allocation (LDA) to identify recurring themes in political discourse across parties, professions, and election years."
+    "section": "Project overview",
+    "text": "Project overview\nThis project studies whether French electoral manifestos are shaped more strongly by party ideology or by candidates’ socio-professional characteristics.\nUsing manifesto texts from the Archelec archive, the project applies topic modeling with Latent Dirichlet Allocation (LDA) to identify recurring themes in political discourse across parties, professions, and election years."
   },
   {
     "objectID": "index.html#from-research-project-to-mlops-system",
