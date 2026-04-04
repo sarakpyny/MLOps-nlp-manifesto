@@ -18,6 +18,12 @@ Documentation
 Local Swagger UI: http://127.0.0.1:8000/docs
 Deployed Swagger UI: https://manifesto-api-sny.lab.sspcloud.fr/docs
 
+## Swagger interface
+
+The API is documented through an interactive Swagger UI, available both locally and on the deployed application.
+
+![](assets/swagger-ui.png)
+
 Example request
 
 ```bash

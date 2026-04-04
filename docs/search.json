@@ -74,7 +74,14 @@
     "href": "api.html#run-locally",
     "title": "API usage",
     "section": "Run locally",
-    "text": "Run locally\nuv run uvicorn app.api:app --reload\nDocumentation Local Swagger UI: http://127.0.0.1:8000/docs Deployed Swagger UI: https://manifesto-api-sny.lab.sspcloud.fr/docs\nExample request\ncurl -X POST \"http://127.0.0.1:8000/predict_topics\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"text\": \"Nous voulons défendre la justice sociale.\"}'\nExample response Add here a real JSON response captured from the API, for example:\n{\n  \"processed_text\": \"vouloir défendre justice social service public\",\n  \"top_topic_id\": 4,\n  \"top_topic_label\": \"français_national_liberté\",\n  \"top_topic_score\": 0.8539606046385947,\n  \"topic_distribution\": [\n    0.020875688261488397,\n    0.02086718061520562,\n    0.020850240568247337,\n    0.02087238559487796,\n    0.8539606046385947,\n    0.020851844617826007,\n    0.02085487065904547,\n    0.020867185044714447\n  ]\n}\nTypical usage The API can be used to: * test new manifesto excerpts * inspect topic probabilities * integrate the model into other applications * demonstrate the deployed inference layer"
+    "text": "Run locally\nuv run uvicorn app.api:app --reload\nDocumentation Local Swagger UI: http://127.0.0.1:8000/docs Deployed Swagger UI: https://manifesto-api-sny.lab.sspcloud.fr/docs"
+  },
+  {
+    "objectID": "api.html#swagger-interface",
+    "href": "api.html#swagger-interface",
+    "title": "API usage",
+    "section": "Swagger interface",
+    "text": "Swagger interface\nThe API is documented through an interactive Swagger UI, available both locally and on the deployed application.\n\nExample request\ncurl -X POST \"http://127.0.0.1:8000/predict_topics\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"text\": \"Nous voulons défendre la justice sociale.\"}'\nExample response Add here a real JSON response captured from the API, for example:\n{\n  \"processed_text\": \"vouloir défendre justice social service public\",\n  \"top_topic_id\": 4,\n  \"top_topic_label\": \"français_national_liberté\",\n  \"top_topic_score\": 0.8539606046385947,\n  \"topic_distribution\": [\n    0.020875688261488397,\n    0.02086718061520562,\n    0.020850240568247337,\n    0.02087238559487796,\n    0.8539606046385947,\n    0.020851844617826007,\n    0.02085487065904547,\n    0.020867185044714447\n  ]\n}\nTypical usage The API can be used to: * test new manifesto excerpts * inspect topic probabilities * integrate the model into other applications * demonstrate the deployed inference layer"
   },
   {
     "objectID": "dataset.html",

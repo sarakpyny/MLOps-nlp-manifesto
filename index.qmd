@@ -2,6 +2,8 @@
 title: "Party Influence in French Electoral Manifestos"
 ---
 
+This website presents the MLOps version of an NLP project on French electoral manifestos, including the dataset, method, architecture, API, and baseline results.
+
 ## Project overview
 
 This project studies whether French electoral manifestos are shaped more strongly by **party ideology** or by **candidates' socio-professional characteristics**.
