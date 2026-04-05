@@ -3,18 +3,20 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
+import mlflow
 import pandas as pd
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
-from src.inference.predictor import predict_topics
-
 APP_NAME = "Manifesto Topic API"
-APP_VERSION = "0.2.0"
+APP_VERSION = "0.3.0"
 DEFAULT_EXPERIMENT_DIR = Path("outputs/baseline_lda")
+DEFAULT_REGISTERED_MODEL = "manifesto_topic_model"
+DEFAULT_MODEL_STAGE = "None"
 
 
 class PredictRequest(BaseModel):
@@ -42,8 +44,59 @@ app = FastAPI(
 
 
 def get_experiment_dir() -> Path:
-    """Return the default experiment directory."""
+    """Return the default experiment directory for local analytical files."""
     return DEFAULT_EXPERIMENT_DIR
+
+
+def get_tracking_uri() -> str | None:
+    """Return the MLflow tracking URI from environment."""
+    return os.getenv("MLFLOW_TRACKING_URI")
+
+
+def get_registered_model_name() -> str:
+    """Return the MLflow registered model name."""
+    return os.getenv("MLFLOW_MODEL_NAME", DEFAULT_REGISTERED_MODEL)
+
+
+def get_model_stage() -> str:
+    """Return the desired MLflow model stage."""
+    return os.getenv("MLFLOW_MODEL_STAGE", DEFAULT_MODEL_STAGE)
+
+
+def get_model_uri() -> str:
+    """Build the MLflow model URI."""
+    model_name = get_registered_model_name()
+    model_stage = get_model_stage()
+    return f"models:/{model_name}/{model_stage}"
+
+
+def load_registry_model():
+    """Load the prediction model from MLflow registry."""
+    tracking_uri = get_tracking_uri()
+    if tracking_uri:
+        mlflow.set_tracking_uri(tracking_uri)
+
+    model_uri = get_model_uri()
+    return mlflow.pyfunc.load_model(model_uri)
+
+
+def predict_topics_from_registry(text: str) -> dict[str, Any]:
+    """Predict topic distribution for one text using the registry model."""
+    if not isinstance(text, str) or not text.strip():
+        raise ValueError("Input text must be a non-empty string.")
+
+    model = load_registry_model()
+    input_df = pd.DataFrame({"text": [text]})
+    predictions = model.predict(input_df)
+
+    if not predictions:
+        raise ValueError("Model returned no prediction.")
+
+    result = predictions[0]
+    if not isinstance(result, dict):
+        raise ValueError("Model returned an unexpected prediction format.")
+
+    return result
 
 
 def read_json_file(path: Path) -> dict[str, Any]:
@@ -107,33 +160,45 @@ def root() -> dict[str, str]:
 def health() -> dict[str, Any]:
     """Health check endpoint."""
     experiment_dir = get_experiment_dir()
+    model_uri = get_model_uri()
 
-    required_files = [
-        experiment_dir / "lda_model.joblib",
-        experiment_dir / "vectorizer.joblib",
-        experiment_dir / "run_config.json",
+    required_local_files = [
         experiment_dir / "topic_labels.json",
         experiment_dir / "topics_summary.csv",
         experiment_dir / "data_topics.csv",
     ]
+    missing_local_files = [str(path)
+                           for path in required_local_files if not path.exists()]
 
-    missing_files = [str(path) for path in required_files if not path.exists()]
+    registry_status = "ok"
+    registry_error = None
+    try:
+        load_registry_model()
+    except Exception as exc:  # pragma: no cover
+        registry_status = "degraded"
+        registry_error = str(exc)
+
+    overall_status = "ok"
+    if missing_local_files or registry_error:
+        overall_status = "degraded"
 
     return {
-        "status": "ok" if not missing_files else "degraded",
-        "experiment_dir": str(experiment_dir),
-        "missing_files": missing_files,
+        "status": overall_status,
+        "prediction_backend": "mlflow_registry",
+        "model_uri": model_uri,
+        "tracking_uri": get_tracking_uri(),
+        "registry_status": registry_status,
+        "registry_error": registry_error,
+        "analysis_experiment_dir": str(experiment_dir),
+        "missing_local_files": missing_local_files,
     }
 
 
 @app.post("/predict_topics", response_model=PredictResponse)
 def predict_topics_endpoint(payload: PredictRequest) -> PredictResponse:
-    """Predict topic distribution for one text."""
-    experiment_dir = get_experiment_dir()
-
+    """Predict topic distribution for one text using MLflow registry."""
     try:
-        result = predict_topics(
-            text=payload.text, experiment_dir=experiment_dir)
+        result = predict_topics_from_registry(payload.text)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except FileNotFoundError as exc:
@@ -190,17 +255,15 @@ def get_stats() -> dict[str, Any]:
             "year_min": int(df["year"].min()) if "year" in df.columns else None,
             "year_max": int(df["year"].max()) if "year" in df.columns else None,
         }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Stats failed: {e}")
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500, detail=f"Stats failed: {exc}") from exc
 
     if "dominant_topic" in df.columns:
-        dominant_counts = (
-            df["dominant_topic"]
-            .value_counts()
-            .sort_index()
-            .to_dict()
-        )
+        dominant_counts = df["dominant_topic"].value_counts(
+        ).sort_index().to_dict()
         stats["dominant_topic_counts"] = {}
+
         for key, value in dominant_counts.items():
             if isinstance(key, str) and key.startswith("Topic_"):
                 topic_id = key.split("_")[1]
@@ -232,9 +295,11 @@ def build_profile(
     try:
         mean_scores = filtered_df[topic_cols].mean(
         ).sort_values(ascending=False)
-    except Exception as e:
+    except Exception as exc:
         raise HTTPException(
-            status_code=500, detail=f"Profile computation failed: {e}")
+            status_code=500,
+            detail=f"Profile computation failed: {exc}",
+        ) from exc
 
     top_topics: list[dict[str, Any]] = []
     for topic_col, score in mean_scores.head(5).items():
