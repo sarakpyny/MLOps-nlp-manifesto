@@ -49,13 +49,6 @@
     "text": "Link with the API\nThe same saved artifacts are reused in the inference layer and exposed through the FastAPI application.\nThis means the website, the training pipeline, and the deployed API all rely on the same baseline experiment outputs."
   },
   {
-    "objectID": "results.html#next-improvement",
-    "href": "results.html#next-improvement",
-    "title": "Results",
-    "section": "Next improvement",
-    "text": "Next improvement\nA stronger presentation layer could add:\n\na chart of topic prevalence across the corpus\na comparison by political party\na comparison by socio-professional category\none or two concrete manifesto examples with predicted topic distributions"
-  },
-  {
     "objectID": "api.html",
     "href": "api.html",
     "title": "API usage",
@@ -88,7 +81,21 @@
     "href": "api.html#swagger-interface",
     "title": "API usage",
     "section": "Swagger interface",
-    "text": "Swagger interface\nThe API is documented through an interactive Swagger UI, available both locally and on the deployed application.\n\nExample request\ncurl -X POST \"http://127.0.0.1:8000/predict_topics\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"text\": \"Nous voulons défendre la justice sociale.\"}'\nExample response Add here a real JSON response captured from the API, for example:\n{\n  \"processed_text\": \"vouloir défendre justice social service public\",\n  \"top_topic_id\": 4,\n  \"top_topic_label\": \"français_national_liberté\",\n  \"top_topic_score\": 0.8539606046385947,\n  \"topic_distribution\": [\n    0.020875688261488397,\n    0.02086718061520562,\n    0.020850240568247337,\n    0.02087238559487796,\n    0.8539606046385947,\n    0.020851844617826007,\n    0.02085487065904547,\n    0.020867185044714447\n  ]\n}\nTypical usage The API can be used to: * test new manifesto excerpts * inspect topic probabilities * integrate the model into other applications * demonstrate the deployed inference layer"
+    "text": "Swagger interface\nThe API is documented through an interactive Swagger UI, available both locally and on the deployed application.\n\nExample request\ncurl -X POST \"http://127.0.0.1:8000/predict_topics\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"text\": \"Nous voulons défendre la justice sociale.\"}'"
+  },
+  {
+    "objectID": "api.html#example-response",
+    "href": "api.html#example-response",
+    "title": "API usage",
+    "section": "Example response",
+    "text": "Example response\n{\n  \"processed_text\": \"vouloir défendre justice social service public\",\n  \"top_topic_id\": 4,\n  \"top_topic_label\": \"français_national_liberté\",\n  \"top_topic_score\": 0.8539606046385947,\n  \"topic_distribution\": [\n    0.020875688261488397,\n    0.02086718061520562,\n    0.020850240568247337,\n    0.02087238559487796,\n    0.8539606046385947,\n    0.020851844617826007,\n    0.02085487065904547,\n    0.020867185044714447\n  ]\n}"
+  },
+  {
+    "objectID": "api.html#typical-usage",
+    "href": "api.html#typical-usage",
+    "title": "API usage",
+    "section": "Typical usage",
+    "text": "Typical usage\nThe API can be used to:\n\ntest new manifesto excerpts\ninspect topic probabilities\nintegrate the model into other applications\ndemonstrate the deployed inference layer"
   },
   {
     "objectID": "dataset.html",
@@ -298,13 +305,20 @@
     "href": "architecture.html#deployment-flow",
     "title": "Architecture",
     "section": "Deployment flow",
-    "text": "Deployment flow\nThe project includes: * reproducible local execution with uv * automated tests with GitHub Actions * Docker image build and publication * deployment on SSP Cloud * public API documentation through Swagger UI ## Why this architecture matters\nThis structure separates experimentation from production use. The training pipeline creates reusable artifacts, the inference layer loads them for prediction, and the API exposes the model to external users without requiring them to run the full pipeline themselves."
+    "text": "Deployment flow\nThe project includes:\n\nreproducible local execution with uv\nautomated tests with GitHub Actions\nDocker image build and publication\ndeployment on SSP Cloud\npublic API documentation through Swagger UI"
+  },
+  {
+    "objectID": "architecture.html#why-this-architecture-matters",
+    "href": "architecture.html#why-this-architecture-matters",
+    "title": "Architecture",
+    "section": "Why this architecture matters",
+    "text": "Why this architecture matters\nThis structure separates experimentation from production use. The training pipeline creates reusable artifacts, the inference layer loads them for prediction, and the API exposes the model to external users without requiring them to run the full pipeline themselves."
   },
   {
     "objectID": "architecture.html#current-deployment-target",
     "href": "architecture.html#current-deployment-target",
     "title": "Architecture",
     "section": "Current deployment target",
-    "text": "Current deployment target\nThe FastAPI application is deployed online and exposed through a public Swagger interface: https://manifesto-api-sny.lab.sspcloud.fr/docs"
+    "text": "Current deployment target\nThe FastAPI application is deployed online and exposed through a public Swagger interface:\nhttps://manifesto-api-sny.lab.sspcloud.fr/docs"
   }
 ]

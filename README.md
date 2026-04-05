@@ -32,7 +32,7 @@ data → preprocessing → feature preparation → modeling → outputs → usag
 ## Project Structure
 
 ```text
-PROJECT/
+MLOps-nlp-manifesto/
 ├── app/                    # FastAPI application
 ├── deployment/             # Kubernetes deployment manifests
 ├── notebooks/              # Exploration only (not used in production)
@@ -45,6 +45,7 @@ PROJECT/
 │   ├── inference/          # Load trained artifacts and predict
 │   └── utils/              # Logging and shared utilities
 ├── tests/                  # Unit and API tests
+├── website/                # website presented layers
 ├── .github/workflows/      # GitHub Actions CI/CD workflows
 ├── logs/                   # Log files (ignored by Git)
 ├── outputs/                # Saved experiment artifacts (ignored by Git)
@@ -153,6 +154,8 @@ uv run python train.py \
   --experiment-name baseline_lda_lemma \
   --use-lemmatization
 ```
+
+---
 
 ## Outputs
 

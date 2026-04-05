@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 from src.inference.predictor import predict_topics
 
 APP_NAME = "Manifesto Topic API"
-APP_VERSION = "0.1.0"
+APP_VERSION = "0.2.0"
 DEFAULT_EXPERIMENT_DIR = Path("outputs/baseline_lda")
 
 

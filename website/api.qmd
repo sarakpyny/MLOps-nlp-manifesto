@@ -39,8 +39,7 @@ curl -X POST "http://127.0.0.1:8000/predict_topics" \
 
 ```
 
-Example response
-Add here a real JSON response captured from the API, for example:
+## Example response
 
 ```bash
 {
@@ -62,9 +61,10 @@ Add here a real JSON response captured from the API, for example:
 
 ```
 
-Typical usage
+## Typical usage
 The API can be used to:
-    * test new manifesto excerpts
-    * inspect topic probabilities
-    * integrate the model into other applications
-    * demonstrate the deployed inference layer
+
+* test new manifesto excerpts
+* inspect topic probabilities
+* integrate the model into other applications
+* demonstrate the deployed inference layer

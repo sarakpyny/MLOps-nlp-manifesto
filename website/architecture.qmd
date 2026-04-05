@@ -39,11 +39,13 @@ flowchart LR
 
 ## Deployment flow
 The project includes:
-       * reproducible local execution with uv
-       * automated tests with GitHub Actions
-       * Docker image build and publication
-       * deployment on SSP Cloud
-       * public API documentation through Swagger UI
+
+* reproducible local execution with uv
+* automated tests with GitHub Actions
+* Docker image build and publication
+* deployment on SSP Cloud
+* public API documentation through Swagger UI
+
 ## Why this architecture matters
 
 This structure separates experimentation from production use.
@@ -51,4 +53,7 @@ The training pipeline creates reusable artifacts, the inference layer loads them
 
 ## Current deployment target
 The FastAPI application is deployed online and exposed through a public Swagger interface:
+
+```bash
 https://manifesto-api-sny.lab.sspcloud.fr/docs
+```

@@ -64,12 +64,3 @@ The experiment produces:
 The same saved artifacts are reused in the inference layer and exposed through the FastAPI application.
 
 This means the website, the training pipeline, and the deployed API all rely on the same baseline experiment outputs.
-
-## Next improvement
-
-A stronger presentation layer could add:
-
-- a chart of topic prevalence across the corpus
-- a comparison by political party
-- a comparison by socio-professional category
-- one or two concrete manifesto examples with predicted topic distributions

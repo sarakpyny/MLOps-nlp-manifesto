@@ -178,6 +178,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#run-locally" id="toc-run-locally" class="nav-link" data-scroll-target="#run-locally">Run locally</a></li>
   <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
   <li><a href="#swagger-interface" id="toc-swagger-interface" class="nav-link" data-scroll-target="#swagger-interface">Swagger interface</a></li>
+  <li><a href="#example-response" id="toc-example-response" class="nav-link" data-scroll-target="#example-response">Example response</a></li>
+  <li><a href="#typical-usage" id="toc-typical-usage" class="nav-link" data-scroll-target="#typical-usage">Typical usage</a></li>
   </ul>
 </nav>
     </div>
@@ -227,7 +229,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> POST <span class="st">"http://127.0.0.1:8000/predict_topics"</span> <span class="dt">\</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">"Content-Type: application/json"</span> <span class="dt">\</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">'{"text": "Nous voulons défendre la justice sociale."}'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Example response Add here a real JSON response captured from the API, for example:</p>
+</section>
+<section id="example-response" class="level2">
+<h2 class="anchored" data-anchor-id="example-response">Example response</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"processed_text"</span><span class="ex">:</span> <span class="st">"vouloir défendre justice social service public"</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"top_topic_id"</span><span class="ex">:</span> 4,</span>
@@ -244,7 +248,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="ex">0.020867185044714447</span></span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="ex">]</span></span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Typical usage The API can be used to: * test new manifesto excerpts * inspect topic probabilities * integrate the model into other applications * demonstrate the deployed inference layer</p>
+</section>
+<section id="typical-usage" class="level2">
+<h2 class="anchored" data-anchor-id="typical-usage">Typical usage</h2>
+<p>The API can be used to:</p>
+<ul>
+<li>test new manifesto excerpts</li>
+<li>inspect topic probabilities</li>
+<li>integrate the model into other applications</li>
+<li>demonstrate the deployed inference layer</li>
+</ul>
 
 
 </section>
