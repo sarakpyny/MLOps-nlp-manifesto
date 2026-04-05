@@ -16,18 +16,15 @@ fi
 echo "Syncing project environment with dev dependencies..."
 uv sync --dev
 
-echo "Bootstrapping pip inside .venv..."
-.venv/bin/python -m ensurepip --upgrade
-.venv/bin/python -m pip install --upgrade pip
-
-echo "Installing spaCy French model..."
-.venv/bin/python -m pip install fr_core_news_md
+echo "Checking spaCy French model..."
+.venv/bin/python -c "import spacy; spacy.load('fr_core_news_md'); print('fr_core_news_md OK')"
 
 echo "Downloading NLTK stopwords..."
 .venv/bin/python -c "import nltk; nltk.download('stopwords', quiet=True)"
 
+echo "Preparing environment file..."
+[ -f .env ] || cp .env.example .env
+
 echo "Done."
 echo "Activate the environment with:"
 echo "source .venv/bin/activate"
-echo "Then copy config with:"
-echo "cp .env.example .env"
