@@ -38,7 +38,7 @@ def parse_args() -> argparse.Namespace:
         "--n-topics",
         type=int,
         default=8,
-        help="Number of LDA topics.",
+        help="Number of LDA topics for a single run or fallback default.",
     )
     parser.add_argument(
         "--min-doc-length",
@@ -68,13 +68,13 @@ def parse_args() -> argparse.Namespace:
         "--min-df",
         type=int,
         default=20,
-        help="Minimum document frequency for CountVectorizer.",
+        help="Minimum document frequency for CountVectorizer in a single run or fallback default.",
     )
     parser.add_argument(
         "--max-df",
         type=float,
         default=0.95,
-        help="Maximum document frequency for CountVectorizer.",
+        help="Maximum document frequency for CountVectorizer in a single run or fallback default.",
     )
     parser.add_argument(
         "--top-n-words",
@@ -100,6 +100,41 @@ def parse_args() -> argparse.Namespace:
         help="Remote Parquet dataset URL. If omitted, URL_RAW is read from .env.",
     )
 
+    parser.add_argument(
+        "--cv-folds",
+        type=int,
+        default=1,
+        help="Number of folds for model selection. Use 1 to disable cross-validation.",
+    )
+    parser.add_argument(
+        "--selection-metric",
+        type=str,
+        default="perplexity",
+        choices=["perplexity"],
+        help="Metric used to compare candidate topic-model configurations.",
+    )
+    parser.add_argument(
+        "--candidate-n-topics",
+        type=int,
+        nargs="+",
+        default=None,
+        help="Candidate values for number of topics. Example: --candidate-n-topics 6 8 10",
+    )
+    parser.add_argument(
+        "--candidate-min-df",
+        type=int,
+        nargs="+",
+        default=None,
+        help="Candidate values for min_df. Example: --candidate-min-df 10 20 30",
+    )
+    parser.add_argument(
+        "--candidate-max-df",
+        type=float,
+        nargs="+",
+        default=None,
+        help="Candidate values for max_df. Example: --candidate-max-df 0.90 0.95",
+    )
+
     return parser.parse_args()
 
 
@@ -113,6 +148,15 @@ def get_spacy_model(cli_value: str | None) -> str:
         return env_value
 
     return "fr_core_news_md"
+
+
+def resolve_candidate_grid(args: argparse.Namespace) -> dict[str, list[int | float]]:
+    """Build the candidate parameter grid for model selection."""
+    return {
+        "n_topics": args.candidate_n_topics or [args.n_topics],
+        "min_df": args.candidate_min_df or [args.min_df],
+        "max_df": args.candidate_max_df or [args.max_df],
+    }
 
 
 def validate_inputs(args: argparse.Namespace) -> None:
@@ -130,3 +174,18 @@ def validate_inputs(args: argparse.Namespace) -> None:
         raise ValueError("--max-df must be in the interval (0, 1].")
     if args.top_n_words <= 0:
         raise ValueError("--top-n-words must be greater than 0.")
+    if args.cv_folds <= 0:
+        raise ValueError("--cv-folds must be greater than 0.")
+
+    if args.candidate_n_topics is not None:
+        if any(value <= 0 for value in args.candidate_n_topics):
+            raise ValueError("All values in --candidate-n-topics must be > 0.")
+
+    if args.candidate_min_df is not None:
+        if any(value <= 0 for value in args.candidate_min_df):
+            raise ValueError("All values in --candidate-min-df must be > 0.")
+
+    if args.candidate_max_df is not None:
+        if any(not 0 < value <= 1 for value in args.candidate_max_df):
+            raise ValueError(
+                "All values in --candidate-max-df must be in the interval (0, 1].")
