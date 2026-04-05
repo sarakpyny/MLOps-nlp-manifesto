@@ -24,8 +24,41 @@ The system follows a full pipeline:
 
 ```text
 data → preprocessing → feature preparation → modeling → outputs → usage
+```
+
+## System Architecture
+
+The project follows an end-to-end MLOps pipeline:
+
+```text
+External Parquet data (S3)
+        ↓
+training pipeline (train.py)
+        ↓
+text preprocessing + feature preparation
+        ↓
+LDA topic model + cross-validation
+        ↓
+saved artifacts + MLflow tracking
+        ↓
+registered production model
+        ↓
+FastAPI service
+        ↓
+Kubernetes deployment via ArgoCD
+        ↓
+API consumers + documentation website
 
 ```
+
+### Architecture notes
+
+* `train.py` handles training, model selection, artifact generation, and MLflow registration.
+* `app/api.py` serves predictions through FastAPI.
+* `/predict_topics` uses the registered MLflow production model.
+* Analytical endpoints such as `/topics` and `/stats` use saved reference artifacts from a baseline experiment.
+* The API is containerized with Docker, published through GitHub Actions, and deployed on SSP Cloud through a separate GitOps repository synchronized by ArgoCD.
+* A Quarto website provides a presentation layer for non-technical users.
 
 ---
 
@@ -46,7 +79,7 @@ MLOps-nlp-manifesto/
 │   ├── inference/          # Load trained artifacts and predict
 │   └── utils/              # Logging and shared utilities
 ├── tests/                  # Unit and API tests
-├── website/                # website presented layers
+├── website/                # Quarto website source files
 ├── .github/workflows/      # GitHub Actions CI/CD workflows
 ├── logs/                   # Log files (ignored by Git)
 ├── outputs/                # Saved experiment artifacts (ignored by Git)
@@ -118,7 +151,7 @@ The following are intentionally **not versioned**:
 
 The training pipeline reads a merged Parquet dataset from external object storage S3:
 
-```bash
+```text
 https://minio.lab.sspcloud.fr/sny/mlops-manifesto/processed/manifestos_raw.parquet
 
 ```
@@ -202,45 +235,44 @@ result = predict_topics(
 print(result)
 ```
 
+---
+
 ## API
 
-### Run API locally
+### Run locally
 
 ```bash
 uv run uvicorn app.api:app --reload
-
 ```
 
-### Documentation
+Local docs:
 
-#### Local
-
-```bash
+```text
 http://127.0.0.1:8000/docs
 ```
 
-#### Live deployed API
+Live deployed docs:
 
-```bahs
+```text
 https://manifesto-api-sny.lab.sspcloud.fr/docs
 ```
 
-Example:
+---
 
-```bash
+## Serving design
 
-curl -X POST "<http://127.0.0.1:8000/predict_topics>" \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Nous voulons défendre la justice sociale."}'
+The API uses a hybrid serving design:
 
+* `/predict_topics` serves the registered MLflow production model
+* `/topics`, `/stats`, `/party_profile/{party}`, and `/profession_profile/{profession}` rely on saved analytical artifacts from a reference experiment directory
+
+Health check:
+
+```text
+https://manifesto-api-sny.lab.sspcloud.fr/health
 ```
 
-### API design note
-
-The API currently uses a hybrid serving design:
-
-* `/predict_topics` loads the prediction model from the MLflow registry
-* `/topics, /stats, /party_profile/{party}, and /profession_profile/{profession}` still rely on local saved analytical files from an experiment directory
+---
 
 ## Presentation Layer
 
@@ -252,12 +284,11 @@ The website includes:
 * method summary
 * API usage
 * architecture page
-
-results summary
+* results summary
 
 Live site:
 
-```bash
+```text
 https://sarakpyny.github.io/MLOps-nlp-manifesto/
 ```
 
@@ -265,13 +296,20 @@ https://sarakpyny.github.io/MLOps-nlp-manifesto/
 
 ## Deployment
 
-The FastAPI application is deployed on SSP Cloud with a Kubernetes-based setup managed through ArgoCD.
+The FastAPI application is deployed on SSP Cloud with Kubernetes and synchronized through ArgoCD from a separate GitOps repository.
+Live endpoints:
 
-Live endpoints
-
-```bash
+```text
 https://manifesto-api-sny.lab.sspcloud.fr/docs
+https://manifesto-api-sny.lab.sspcloud.fr/health
 ```
+
+The deployed API currently serves:
+
+* a registry-backed prediction endpoint through MLflow
+* analysis endpoints backed by saved experiment artifacts
+
+---
 
 ## Docker
 
@@ -281,26 +319,24 @@ https://manifesto-api-sny.lab.sspcloud.fr/docs
 docker build \
   --build-arg URL_RAW="https://minio.lab.sspcloud.fr/sny/mlops-manifesto/processed/manifestos_raw.parquet" \
   -t mlops-manifestos-api .
-
 ```
 
-Run local image:
+### Run locally
 
 ```bash
 docker run -p 8000:8000 mlops-manifestos-api
 ```
 
-Pull published image:
+### Pull published image
 
 ```bash
-docker pull nysarakpy/mlops-manifestos-api:latest
+docker pull nysarakpy/mlops-manifestos-api:v0.3.0
 ```
 
-Swagger UI:
+### Swagger UI
 
-```bash
+```text
 http://127.0.0.1:8000/docs
-
 ```
 
 ## CI/CD
@@ -331,111 +367,96 @@ uv run pytest -v
 
 ### Phase 0 — Initialization
 
-* Project initialized from an NLP notebook-based repository
-* `main` branch preserved as baseline
-* `mlops` branch used for development
+Initialized the project from the original NLP notebook repository, preserved `main` as baseline, and used `mlops` as the development branch.
 
 ### Phase 1 — Product Definition
 
-* Defined problem, inputs, outputs, and users
-* Framed as a full ML system
+Defined the problem, users, inputs, and outputs, and reframed the work as a complete ML system.
 
 ### Phase 2 — Baseline Pipeline
 
-* Created `train.py` script
-* End-to-end execution from terminal
+Created `train.py` to run the end-to-end training pipeline from the command line.
 
 ### Phase 3 — Parameterization
 
-* Added CLI arguments with `argparse`
-* Introduced `.env` configuration
-* Improved reproducibility and logging
+Added CLI arguments and `.env` configuration to make experiments reproducible and configurable.
 
 ### Phase 4 — Modular Structure
 
-* Refactored code into `src/` modules
-* Separated data, preprocessing, features, modeling, and outputs
-* `train.py` handles orchestration only
+Refactored the notebook logic into `src/` modules and kept `train.py` as the orchestration entry point only.
 
 ### Phase 5 — Reproducibility
 
-* Added `pyproject.toml` for explicit dependency management
-* Added `uv.lock` for locked reproducible environments
-* Added `install.sh` for one-command setup
-* Added `.env.example` for transparent configuration
-* Strengthened `.gitignore` to exclude data, outputs, models, logs, and secrets
-* Updated installation instructions for portability
+Added `pyproject.toml`, `uv.lock`, `install.sh`, `.env.example`, and a stronger `.gitignore` for reproducible setup across machines.
 
 ### Phase 5bis — Externalized Data Layer
 
-* Exported the merged dataset to CSV and Parquet
-* Updated training and feature preparation to rely on the external Parquet dataset instead of local raw files
+Moved the training input to an external Parquet dataset so the pipeline no longer depends on local raw files.
+
+### Phase 6 — Logging & Tests
+
+Added structured logging and unit tests to improve traceability and reliability before CI integration.
+
+### Phase 7 — Separate Training and Inference
+
+Separated training from inference, added reusable prediction code in `src/inference/`, and introduced human-readable topic labels.
+
+### Phase 8 — API
+
+Built a FastAPI application with prediction and analysis endpoints, API tests, and Swagger documentation.
+
+### Phase 9 — Containerization
+
+Packaged the application in Docker so it can run consistently across environments.
+
+### Phase 10 — CI/CD Automation
+
+Added GitHub Actions workflows for testing, linting, and Docker image publication.
+
+### Phase 11 — Deployment
+
+Deployed the FastAPI application on SSP Cloud and exposed the live API and Swagger documentation.
+
+### Phase 12 — Presentation Layer
+
+Added a Quarto website published on GitHub Pages to present the project, method, architecture, and API.
+
+### Phase 13 — Advanced MLOps
+
+Added cross-validation-based model selection, MLflow experiment tracking, model registry integration, and registry-based serving for prediction.
 
 ---
 
-## Phase 6 — Logging & Tests
+## Current Status
 
-* Added structured logging to console and file
-* Replaced print-based pipeline traces with logging
-* Added 11 unit tests covering core pipeline components
-* Improved reliability and traceability before CI
+The project is now implemented as an end-to-end MLOps pipeline.
 
-## Phase 7 — Separate Training and Inference
+* reproducible Python environment with `uv`, `pyproject.toml`, and `uv.lock`
+* modular training and inference code under `src/`
+* automated quality checks and tests with GitHub Actions
+* Docker image publishing to Docker Hub
+* Kubernetes deployment on SSP Cloud through ArgoCD and a separate GitOps repository
+* public FastAPI documentation exposed through `/docs`
+* Quarto website published on GitHub Pages
+* MLflow experiment tracking and registry-based prediction serving
 
-* Kept `train.py` dedicated to model training and artifact generation
-* Implemented `src/inference/` to load saved artifacts and predict on new text
-* Added single-text preprocessing for inference
-* Introduced `topic_labels.json` for human-readable topic outputs
-* Added inference tests for:
-  * invalid input
-  * output structure
-  * probability validity
+The deployed API currently serves:
 
-## Phase 8 — API
+* `/predict_topics` from the registered MLflow production model
+* analytical endpoints from saved experiment artifacts
 
-* Built FastAPI app (app/api.py)
-* Added endpoints for prediction and analysis
-* Added API tests (TestClient)
-* Enabled Swagger UI
+---
 
-## Phase 9 — Containerization
+## Future Improvements
 
-* Added a Dockerfile
-* Built a runnable image for the FastAPI application
-* Packaged dependencies, source code, and saved artifacts in the container
+Possible extensions:
 
-## Phase 10 — CI/CD Automation
+* moving analytical endpoints to fully registry-based or external artifact serving
+* connecting the deployment to a shared remote MLflow tracking server instead of image-local storage
+* adding automated retraining or orchestration workflows
+* enriching the website with more visualizations and model comparison results
 
-* Added GitHub Actions workflows under `.github/workflows/`
-* Automated Docker image build and publication to Docker Hub
-* Made runtime dependencies explicit in CI and Docker builds
-
-## Phase 11 — Deployment
-
-* Deployed the FastAPI application on SSP Cloud
-* Exposed a live API URL
-* Made Swagger documentation reachable online at /docs
-
-## Phase 12 — Presentation Layer
-
-* Added a Quarto documentation website
-* Published the site with GitHub Pages
-* Structured the presentation for non-technical users
-* Included project overview, dataset, method, API usage, architecture, and results summary
-
-## Phase 13 — Advanced MLOps
-
-* Added configurable model selection with cross-validation in train.py
-* Introduced candidate hyperparameter search for LDA experiments
-* Registered the prediction model in the MLflow Model Registry
-* Updated the prediction API endpoint to load the model from the registry
-
-## Next Steps
-
-* Promote registered versions to Staging or Production
-* Extend registry-based serving to more API endpoints
-* Add automated retraining workflows
-* Enrich the website with additional result visualizations
+---
 
 ## Users
 
