@@ -24,8 +24,8 @@ def test_health_returns_ok() -> None:
 
     payload = response.json()
     assert payload["status"] in {"ok", "degraded"}
-    assert "experiment_dir" in payload
-    assert "missing_files" in payload
+    assert "analysis_experiment_dir" in payload
+    assert "missing_local_files" in payload
 
 
 def test_predict_topics_returns_valid_response() -> None:
