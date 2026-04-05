@@ -45,3 +45,9 @@ logs/
 *.log
 /.quarto/
 **/*.quarto_ipynb
+
+# Ignore MLflow runs directory
+mlruns
+
+# Ignore MLflow SQLite database file
+mlflow.db
