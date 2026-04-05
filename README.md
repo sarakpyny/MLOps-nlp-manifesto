@@ -69,7 +69,7 @@ MLOps-nlp-manifesto/
 ├── app/                    # FastAPI application
 ├── deployment/             # Kubernetes deployment manifests
 ├── docs/                   # Rendered Quarto website for GitHub Pages
-├── notebooks/              # Exploration only (not used in production)
+├── notebooks/              # Exploration only (original notebook, not used in production)
 ├── src/
 │   ├── data/               # Data loading and output saving
 │   ├── preprocessing/      # Text and metadata cleaning
@@ -153,7 +153,6 @@ The training pipeline reads a merged Parquet dataset from external object storag
 
 ```text
 https://minio.lab.sspcloud.fr/sny/mlops-manifesto/processed/manifestos_raw.parquet
-
 ```
 
 This URL is provided through the environment variable `URL_RAW`.
@@ -301,7 +300,6 @@ Live endpoints:
 
 ```text
 https://manifesto-api-sny.lab.sspcloud.fr/docs
-https://manifesto-api-sny.lab.sspcloud.fr/health
 ```
 
 The deployed API currently serves:
@@ -327,16 +325,16 @@ docker build \
 docker run -p 8000:8000 mlops-manifestos-api
 ```
 
-### Pull published image
-
-```bash
-docker pull nysarakpy/mlops-manifestos-api:v0.3.0
-```
-
 ### Swagger UI
 
 ```text
 http://127.0.0.1:8000/docs
+```
+
+### Pull published image
+
+```bash
+docker pull nysarakpy/mlops-manifestos-api:v0.3.0
 ```
 
 ---
@@ -457,7 +455,6 @@ Possible extensions:
 
 * moving analytical endpoints to fully registry-based or external artifact serving
 * connecting the deployment to a shared remote MLflow tracking server instead of image-local storage
-* adding automated retraining or orchestration workflows
 * enriching the website with more visualizations and model comparison results
 
 ---

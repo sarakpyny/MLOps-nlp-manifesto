@@ -14,10 +14,16 @@ spec:
     spec:
       containers:
         - name: mlops-manifestos-api
-          image: nysarakpy/mlops-manifestos-api:latest
+          image: nysarakpy/mlops-manifestos-api:v0.3.0
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
           env:
             - name: URL_RAW
               value: "https://minio.lab.sspcloud.fr/sny/mlops-manifesto/processed/manifestos_raw.parquet"
+            - name: MLFLOW_TRACKING_URI
+              value: "sqlite:///mlflow.db"
+            - name: MLFLOW_MODEL_NAME
+              value: "manifesto_topic_model"
+            - name: MLFLOW_MODEL_ALIAS
+              value: "production"
