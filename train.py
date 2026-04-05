@@ -147,7 +147,7 @@ def register_prediction_model(experiment_path: Path) -> None:
 
     signature = infer_signature(input_example, output_example)
 
-    mlflow.pyfunc.log_model(
+    model_info = mlflow.pyfunc.log_model(
         artifact_path="manifesto_topic_model",
         python_model=ManifestoTopicPyFuncModel(),
         artifacts={
@@ -160,6 +160,16 @@ def register_prediction_model(experiment_path: Path) -> None:
         signature=signature,
         registered_model_name="manifesto_topic_model",
     )
+
+    client = mlflow.tracking.MlflowClient()
+    model_version = model_info.registered_model_version
+
+    if model_version is not None:
+        client.set_registered_model_alias(
+            name="manifesto_topic_model",
+            alias="production",
+            version=model_version,
+        )
 
 
 def main() -> None:
