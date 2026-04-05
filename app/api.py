@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
-from functools import lru_cache
 
 import mlflow
 import pandas as pd
@@ -19,12 +20,17 @@ DEFAULT_EXPERIMENT_DIR = Path("outputs/baseline_lda")
 DEFAULT_REGISTERED_MODEL = "manifesto_topic_model"
 DEFAULT_MODEL_ALIAS = "production"
 
+logger = logging.getLogger(__name__)
+
 
 class PredictRequest(BaseModel):
     """Request body for topic prediction."""
 
-    text: str = Field(..., min_length=1,
-                      description="Raw manifesto text to analyze.")
+    text: str = Field(
+        ...,
+        min_length=1,
+        description="Raw manifesto text to analyze.",
+    )
 
 
 class PredictResponse(BaseModel):
@@ -66,6 +72,11 @@ def get_model_uri() -> str:
     return f"models:/{model_name}@{model_alias}"
 
 
+def use_registry_backend() -> bool:
+    """Return whether registry-based prediction is enabled."""
+    return bool(get_tracking_uri())
+
+
 @lru_cache(maxsize=1)
 def load_registry_model():
     """Load and cache the prediction model from MLflow registry."""
@@ -73,27 +84,46 @@ def load_registry_model():
     if tracking_uri:
         mlflow.set_tracking_uri(tracking_uri)
 
-    model_uri = get_model_uri()
-    return mlflow.pyfunc.load_model(model_uri)
+    return mlflow.pyfunc.load_model(get_model_uri())
 
 
-def predict_topics_from_registry(text: str) -> dict[str, Any]:
-    """Predict topic distribution for one text using the registry model."""
+def predict_topics_local(text: str) -> dict[str, Any]:
+    """Predict topics using saved local artifacts."""
+    from src.inference.predictor import predict_topics as local_predict_topics
+
+    return local_predict_topics(
+        text=text,
+        experiment_dir=get_experiment_dir(),
+    )
+
+
+def predict_topics(text: str) -> dict[str, Any]:
+    """Predict topics using registry if available, otherwise local artifacts."""
     if not isinstance(text, str) or not text.strip():
         raise ValueError("Input text must be a non-empty string.")
 
-    model = load_registry_model()
-    input_df = pd.DataFrame({"text": [text]})
-    predictions = model.predict(input_df)
+    if use_registry_backend():
+        try:
+            model = load_registry_model()
+            input_df = pd.DataFrame({"text": [text]})
+            predictions = model.predict(input_df)
 
-    if not predictions:
-        raise ValueError("Model returned no prediction.")
+            if len(predictions) == 0:
+                raise ValueError("Model returned no prediction.")
 
-    result = predictions[0]
-    if not isinstance(result, dict):
-        raise ValueError("Model returned an unexpected prediction format.")
+            result = predictions[0]
+            if not isinstance(result, dict):
+                raise ValueError(
+                    "Model returned an unexpected prediction format.")
 
-    return result
+            return result
+        except Exception as exc:
+            logger.warning(
+                "Registry prediction failed, falling back to local artifacts: %s",
+                exc,
+            )
+
+    return predict_topics_local(text)
 
 
 def read_json_file(path: Path) -> dict[str, Any]:
@@ -113,7 +143,7 @@ def read_csv_file(path: Path) -> pd.DataFrame:
 
 def get_topic_columns(df: pd.DataFrame) -> list[str]:
     """Return sorted topic columns safely."""
-    topic_cols = []
+    topic_cols: list[str] = []
 
     for col in df.columns:
         if col.startswith("Topic_"):
@@ -128,20 +158,17 @@ def get_topic_columns(df: pd.DataFrame) -> list[str]:
 
 def get_topic_label_map(experiment_dir: Path) -> dict[str, str]:
     """Load topic labels from the saved experiment."""
-    path = experiment_dir / "topic_labels.json"
-    return read_json_file(path)
+    return read_json_file(experiment_dir / "topic_labels.json")
 
 
 def get_topics_summary_df(experiment_dir: Path) -> pd.DataFrame:
     """Load the topic summary CSV."""
-    path = experiment_dir / "topics_summary.csv"
-    return read_csv_file(path)
+    return read_csv_file(experiment_dir / "topics_summary.csv")
 
 
 def get_data_topics_df(experiment_dir: Path) -> pd.DataFrame:
     """Load the document-topic analysis CSV."""
-    path = experiment_dir / "data_topics.csv"
-    return read_csv_file(path)
+    return read_csv_file(experiment_dir / "data_topics.csv")
 
 
 @app.get("/")
@@ -157,7 +184,6 @@ def root() -> dict[str, str]:
 def health() -> dict[str, Any]:
     """Health check endpoint."""
     experiment_dir = get_experiment_dir()
-    model_uri = get_model_uri()
 
     required_local_files = [
         experiment_dir / "topic_labels.json",
@@ -167,22 +193,27 @@ def health() -> dict[str, Any]:
     missing_local_files = [str(path)
                            for path in required_local_files if not path.exists()]
 
-    registry_status = "ok"
+    registry_status = None
     registry_error = None
-    try:
-        load_registry_model()
-    except Exception as exc:  # pragma: no cover
-        registry_status = "degraded"
-        registry_error = str(exc)
+
+    if use_registry_backend():
+        registry_status = "ok"
+        try:
+            load_registry_model()
+        except Exception as exc:  # pragma: no cover
+            registry_status = "degraded"
+            registry_error = str(exc)
 
     overall_status = "ok"
-    if missing_local_files or registry_error:
+    if missing_local_files:
+        overall_status = "degraded"
+    if use_registry_backend() and registry_error:
         overall_status = "degraded"
 
     return {
         "status": overall_status,
-        "prediction_backend": "mlflow_registry",
-        "model_uri": model_uri,
+        "prediction_backend": "mlflow_registry" if use_registry_backend() else "local_artifacts",
+        "model_uri": get_model_uri() if use_registry_backend() else None,
         "tracking_uri": get_tracking_uri(),
         "registry_status": registry_status,
         "registry_error": registry_error,
@@ -193,9 +224,9 @@ def health() -> dict[str, Any]:
 
 @app.post("/predict_topics", response_model=PredictResponse)
 def predict_topics_endpoint(payload: PredictRequest) -> PredictResponse:
-    """Predict topic distribution for one text using MLflow registry."""
+    """Predict topic distribution for one text."""
     try:
-        result = predict_topics_from_registry(payload.text)
+        result = predict_topics(payload.text)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except FileNotFoundError as exc:
