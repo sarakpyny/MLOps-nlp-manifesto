@@ -17,13 +17,15 @@ outputs/
 logs/
 artifacts/
 mlruns/
+mlflow.db
 *.joblib
 *.pkl
 *.pickle
 *.skops
+*.log
 
 # Data
-/data/
+data/
 *.zip
 *.parquet
 
@@ -35,19 +37,8 @@ mlruns/
 .idea/
 .DS_Store
 
-# Future website / Quarto artifacts
+# Quarto / website artifacts
 .quarto/
 _site/
 *_files/
-
-# Logs
-logs/
-*.log
-/.quarto/
 **/*.quarto_ipynb
-
-# Ignore MLflow runs directory
-mlruns
-
-# Ignore MLflow SQLite database file
-mlflow.db

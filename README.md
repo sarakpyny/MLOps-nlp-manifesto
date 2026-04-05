@@ -270,8 +270,7 @@ The FastAPI application is deployed on SSP Cloud with a Kubernetes-based setup m
 Live endpoints
 
 ```bash
-Swagger UI: https://manifesto-api-sny.lab.sspcloud.fr/docs
-
+https://manifesto-api-sny.lab.sspcloud.fr/docs
 ```
 
 ## Docker
@@ -433,10 +432,10 @@ uv run pytest -v
 
 ## Next Steps
 
-Promote registered versions to Staging or Production
-Extend registry-based serving to more API endpoints
-Add automated retraining workflows
-Enrich the website with additional result visualizations
+* Promote registered versions to Staging or Production
+* Extend registry-based serving to more API endpoints
+* Add automated retraining workflows
+* Enrich the website with additional result visualizations
 
 ## Users
 

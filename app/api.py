@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 from typing import Any
+from functools import lru_cache
 
 import mlflow
 import pandas as pd
@@ -16,7 +17,7 @@ APP_NAME = "Manifesto Topic API"
 APP_VERSION = "0.3.0"
 DEFAULT_EXPERIMENT_DIR = Path("outputs/baseline_lda")
 DEFAULT_REGISTERED_MODEL = "manifesto_topic_model"
-DEFAULT_MODEL_STAGE = "None"
+DEFAULT_MODEL_ALIAS = "production"
 
 
 class PredictRequest(BaseModel):
@@ -58,20 +59,16 @@ def get_registered_model_name() -> str:
     return os.getenv("MLFLOW_MODEL_NAME", DEFAULT_REGISTERED_MODEL)
 
 
-def get_model_stage() -> str:
-    """Return the desired MLflow model stage."""
-    return os.getenv("MLFLOW_MODEL_STAGE", DEFAULT_MODEL_STAGE)
-
-
 def get_model_uri() -> str:
     """Build the MLflow model URI."""
     model_name = get_registered_model_name()
-    model_stage = get_model_stage()
-    return f"models:/{model_name}/{model_stage}"
+    model_alias = os.getenv("MLFLOW_MODEL_ALIAS", DEFAULT_MODEL_ALIAS)
+    return f"models:/{model_name}@{model_alias}"
 
 
+@lru_cache(maxsize=1)
 def load_registry_model():
-    """Load the prediction model from MLflow registry."""
+    """Load and cache the prediction model from MLflow registry."""
     tracking_uri = get_tracking_uri()
     if tracking_uri:
         mlflow.set_tracking_uri(tracking_uri)
