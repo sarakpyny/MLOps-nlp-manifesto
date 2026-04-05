@@ -156,13 +156,13 @@ https://minio.lab.sspcloud.fr/sny/mlops-manifesto/processed/manifestos_raw.parqu
 
 ```
 
-This URL is provided through the environment variable URL_RAW.
+This URL is provided through the environment variable `URL_RAW`.
 
 ---
 
 ## Usage
 
-### Run baseline (fast, no lemmatization)
+### Run baseline (no lemmatization)
 
 ```bash
 uv run python train.py \
@@ -339,6 +339,8 @@ docker pull nysarakpy/mlops-manifestos-api:v0.3.0
 http://127.0.0.1:8000/docs
 ```
 
+---
+
 ## CI/CD
 
 This project includes two GitHub Actions workflows:
@@ -351,6 +353,8 @@ Required GitHub secrets
 * `URL_RAW`
 * `DOCKERHUB_USERNAME`
 * `DOCKERHUB_TOKEN`
+
+---
 
 ## Testing
 
