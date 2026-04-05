@@ -35,6 +35,7 @@ data → preprocessing → feature preparation → modeling → outputs → usag
 MLOps-nlp-manifesto/
 ├── app/                    # FastAPI application
 ├── deployment/             # Kubernetes deployment manifests
+├── docs/                   # Rendered Quarto website for GitHub Pages
 ├── notebooks/              # Exploration only (not used in production)
 ├── src/
 │   ├── data/               # Data loading and output saving
@@ -155,6 +156,17 @@ uv run python train.py \
   --use-lemmatization
 ```
 
+### Run model selection with cross-validation
+
+```bash
+uv run python train.py \
+  --experiment-name lda_cv_search \
+  --cv-folds 3 \
+  --candidate-n-topics 6 8 10 \
+  --candidate-min-df 10 20 \
+  --candidate-max-df 0.90 0.95
+```
+
 ---
 
 ## Outputs
@@ -168,7 +180,10 @@ outputs/<experiment_name>/
 ├── lda_model.joblib
 ├── vectorizer.joblib
 ├── run_config.json
-└── topic_labels.json
+├── topic_labels.json
+├── cv_results.csv
+├── cv_summary.csv
+└── best_params.json
 ```
 
 ---
@@ -219,6 +234,13 @@ curl -X POST "<http://127.0.0.1:8000/predict_topics>" \
   -d '{"text": "Nous voulons défendre la justice sociale."}'
 
 ```
+
+### API design note
+
+The API currently uses a hybrid serving design:
+
+* `/predict_topics` loads the prediction model from the MLflow registry
+* `/topics, /stats, /party_profile/{party}, and /profession_profile/{profession}` still rely on local saved analytical files from an experiment directory
 
 ## Presentation Layer
 
@@ -402,11 +424,19 @@ uv run pytest -v
 * Structured the presentation for non-technical users
 * Included project overview, dataset, method, API usage, architecture, and results summary
 
+## Phase 13 — Advanced MLOps
+
+* Added configurable model selection with cross-validation in train.py
+* Introduced candidate hyperparameter search for LDA experiments
+* Registered the prediction model in the MLflow Model Registry
+* Updated the prediction API endpoint to load the model from the registry
+
 ## Next Steps
 
-* Introduce experiment tracking (MLflow)
-* Add automated validation for external dataset availability
-* Enrich the website with additional result visualizations
+Promote registered versions to Staging or Production
+Extend registry-based serving to more API endpoints
+Add automated retraining workflows
+Enrich the website with additional result visualizations
 
 ## Users
 
