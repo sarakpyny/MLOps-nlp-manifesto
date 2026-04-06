@@ -295,7 +295,8 @@ https://sarakpyny.github.io/MLOps-nlp-manifesto/
 
 ## Deployment
 
-The FastAPI application is deployed on SSP Cloud with Kubernetes and synchronized through ArgoCD from a separate GitOps repository.
+The FastAPI application is deployed on SSP Cloud with Kubernetes and synchronized through ArgoCD from a separate GitOps repository `https://github.com/sarakpyny/manifesto-application-deployment.git`.
+
 Live endpoints:
 
 ```text
@@ -360,7 +361,6 @@ Run the full test suite:
 
 ```bash
 uv run pytest -v
-
 ```
 
 ---
