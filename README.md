@@ -69,7 +69,6 @@ MLOps-nlp-manifesto/
 ├── app/                    # FastAPI application
 ├── deployment/             # Kubernetes deployment manifests
 ├── docs/                   # Rendered Quarto website for GitHub Pages
-├── notebooks/              # Exploration only (original notebook, not used in production)
 ├── src/
 │   ├── data/               # Data loading and output saving
 │   ├── preprocessing/      # Text and metadata cleaning
@@ -265,7 +264,7 @@ The API uses a hybrid serving design:
 * `/predict_topics` serves the registered MLflow production model
 * `/topics`, `/stats`, `/party_profile/{party}`, and `/profession_profile/{profession}` rely on saved analytical artifacts from a reference experiment directory
 
-Health check:
+Check:
 
 ```text
 https://manifesto-api-sny.lab.sspcloud.fr/health
@@ -275,7 +274,7 @@ https://manifesto-api-sny.lab.sspcloud.fr/health
 
 ## Presentation Layer
 
-Phase 12 adds a public-facing documentation website built with Quarto and deployed on GitHub Pages.
+A public-facing documentation website built with Quarto and deployed on GitHub Pages.
 The website includes:
 
 * project overview
