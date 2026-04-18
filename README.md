@@ -200,6 +200,24 @@ uv run python train.py \
 
 ---
 
+## MLflow Tracking
+
+This project uses MLflow for local experiment tracking during training. MLflow helps compare runs, log parameters and metrics, and keep training outputs traceable.
+
+### Launch the MLflow UI locally
+
+```bash
+uv run mlflow ui --backend-store-uri sqlite:///mlflow.db
+```
+
+Open:
+
+```text
+http://127.0.0.1:5000
+```
+
+---
+
 ## Outputs
 
 Each run creates a structured output folder:
@@ -425,26 +443,6 @@ Added a Quarto website published on GitHub Pages to present the project, method,
 ### Phase 13 — Advanced MLOps
 
 Added cross-validation-based model selection, MLflow experiment tracking, model registry integration, and registry-based serving for prediction.
-
----
-
-## Current Status
-
-The project is now implemented as an end-to-end MLOps pipeline.
-
-* reproducible Python environment with `uv`, `pyproject.toml`, and `uv.lock`
-* modular training and inference code under `src/`
-* automated quality checks and tests with GitHub Actions
-* Docker image publishing to Docker Hub
-* Kubernetes deployment on SSP Cloud through ArgoCD and a separate GitOps repository
-* public FastAPI documentation exposed through `/docs`
-* Quarto website published on GitHub Pages
-* MLflow experiment tracking and registry-based prediction serving
-
-The deployed API currently serves:
-
-* `/predict_topics` from the registered MLflow production model
-* analytical endpoints from saved experiment artifacts
 
 ---
 
