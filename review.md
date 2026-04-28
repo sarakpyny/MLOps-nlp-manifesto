@@ -2,9 +2,6 @@
 
 **Reviewer:** Paul Lemoine Vandermoere
 
-Hello,
-Thank you for sharing your project. As part of the cross-review assignment, I have audited your repository to assess its compliance with MLOps best practices and to suggest architectural improvements. 
-
 ---
 
 ## Good Practices Checklist Compliance
@@ -21,7 +18,7 @@ Based on the course guidelines, here is the assessment of your repository's comp
 
 ## General Assessment
 
-Your project demonstrates a very high level. The transition from an exploratory NLP notebook to a fully containerized application is interesting. The separation of concerns shows a deep understanding of the ML lifecycle. The extensive README also makes onboarding easy for new developers. Overall, it aligns with the MLOps philosophy taught in the course.
+Your project demonstrates an high level. The transition from an exploratory NLP notebook to a fully containerized application is interesting. The separation of concerns shows a deep understanding of the ML lifecycle. The extensive README also makes onboarding easy for new developers. Overall, it aligns with the MLOps philosophy taught in the course.
 
 ---
 
